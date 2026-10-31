@@ -1,7 +1,7 @@
 # Bláto Journal
 
-A World of Warcraft addon for **WoW Forever**, made for a party of three friends who level together.
-A character journal and every party feature in one window, each feature a button.
+Three friends made this World of Warcraft addon to get the most out of their Bláto LAN party in **WoW Forever**.
+If you are three friends playing your own LAN party together, feel free to use it.
 
 ## What it does
 
@@ -14,7 +14,7 @@ The **Bláto Journal** window (minimap button or `/blato`) looks like WoW Foreve
 | **Journey** | What the three of you have done together: time, shared quests, dungeons (runs, clears, bosses) and the firsts you shared. Below that, your own character's path, level by level. |
 | Places | The zones and dungeons you have visited. |
 | **Quests** | The quests you handed in, and for each one who of the three of you has done it (✓), has not (✗) or is not known yet (?). On top: quests your friends have done and you have not. |
-| Notes | Notes with reminders ("when I enter Undercity"). |
+| Notes | Notes with reminders ("I owe my buddy 12 gold"). |
 
 Most party features come alive when all three of you run the addon. Your party mates are the two players you have spent the most time grouped with.
 
