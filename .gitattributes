@@ -1,0 +1,5 @@
+# Lua, TOC, XML and text files: LF in the repository
+* text=auto eol=lf
+# Game art and other binaries
+*.tga binary
+*.blp binary

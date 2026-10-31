@@ -1,0 +1,158 @@
+-- One More Quest: "List functionality" (decision 247)
+-- A plain list of everything the addon does, the big things first. No explanation of where or how:
+-- just bullet points, grouped under headings (decision 257; brought up to date with group Crafting in decision 352). Opened from the button at the bottom right of the
+-- full options window.
+local ADDON, OMQ = ...
+OMQ = _G.BlatoParty
+
+local FE = {}
+OMQ.Features = FE
+
+-- Grouped by what the dads do with it (decision 257); the most important group first, and in each group the
+-- big things first. FE.LIST is the same content as one flat list.
+FE.SECTIONS = {
+    { "Playing together", {
+        "One more quest: when the vote (/blato vote) says \"One more quest!\", the arrow leads the group to the next quest every friend has - its objectives, or the turn-in once all are done; no quest in common: a new one everybody can take",
+        "Group statistics for the session, ranked between the friends: XP per hour, levels, gold, yards walked and yards on follow, damage share, killing blows, deaths, near deaths, fights started and more",
+        "Lifetime statistics of every friend's character",
+        "Quests are shared and accepted automatically between friends up to 5 levels apart",
+        "Group quest tracker: every friend's progress on shared quests",
+        "Meeting point and map pin shared with the group",
+        "Item score in every item tooltip, for you and for every friend: what each one wears and whether the item is an upgrade for his class and role",
+        "Follow the flights of the group",
+        "Follow key for the nearest friend",
+        "Mana break note when a friend drinks",
+    } },
+    { "Dungeons", {
+        "Group Check before a dungeon: durability, bags, drinks, class items, distance to the entrance",
+        "Dungeon quests of every friend, where each quest starts, with an arrow to the quest giver and the rewards scored for you",
+        "Best boss loot of a dungeon for you, also for the new Forever dungeons",
+        "Threat meter: everybody's threat on your target, in every group or only in dungeons; as the tank you see who pulls the aggro off you",
+        "Arrow to the dungeon entrance, with how to get in",
+        "Switch between the dungeons of your level in the Group Check",
+        "Progress Check: the milestones of your class, the dungeons and, on request, the quest zones by level; a click on a zone leads to its quest hub",
+    } },
+    { "Finding your way", {
+        "Distance arrow to friends who fell behind",
+        "Arrows to class and profession trainers, vendors, repair, flight masters, mailboxes, inns, banks, auction houses, map pins, the meeting point and your corpse",
+        "Places the friends visit are learned and shared, also in the new Forever zones",
+    } },
+    { "Alert cards", {
+        "Train new skills, with what is new and what it costs, also right after a level up",
+        "Spells not on an action bar, placed with one click",
+        "Dungeon quests you could still take, when you leave a town, a city or a flight master",
+        "Missing buffs, auras, shields, armors, imbues and poisons, cast with one click",
+        "Repair, also before you leave a city or take a flight",
+        "Buy drinks, and a reminder to drink when your mana is low; mages conjure water with one click instead",
+        "Profession training and the tool a profession needs",
+        "Find Minerals and Find Herbs switched on with one click",
+        "Pet basics: hunters call, revive and feed their pet, warlocks summon one of their last three demons",
+        "Unspent talent points, opens the talent tree",
+        "Low ammo",
+        "Use your elixirs, scrolls, buff food, stones and oils - never, always or in dungeons; a stone or oil goes on the weapon you click",
+    } },
+    { "Crafting", {
+        "Crafting profit in the profession window: what the materials cost against what the product brings on the auction house, for every recipe",
+        "Cheapest skill-up: two badges mark the cheapest recipe to skill up, by cost and by profit, and every recipe shows its skill-up chance",
+        "Prices of the whole auction house in one scan, plus the vendor prices you have seen; every item tooltip shows the latest price",
+        "Who in the group needs a crafting material, and who carries the materials of a recipe",
+    } },
+    { "Fun between the friends", {
+        "Bets between the friends, decided automatically, debts paid by mail",
+        "\"One more quest?\" vote, with titles for the session at bed time",
+    } },
+    { "Trading and vendors", {
+        "Auction helper: everything worth more on the auction house, posted with one click each - fast or select mode; it starts with a scan of the whole auction house",
+        "Auction helper, buy mode: weapon upgrades, potions, elixirs, stones, oils, scrolls, buff food and armor kits, bags, reagent bags and quivers for your class - stock up or buy single pieces",
+        "Vendor helper: what to sell at the vendor - grey items, gear not worth the auction house or unsold twice, old food and drink, recipes of professions you do not have",
+        "Automatic repair, selling of grey items, water and ammo at vendors",
+        "Hide the objective tracker",
+        "Sounds for the alerts and the tracker",
+    } },
+}
+FE.LIST = {}
+for _, sec in ipairs(FE.SECTIONS) do
+    for _, t in ipairs(sec[2]) do FE.LIST[#FE.LIST + 1] = t end
+end
+
+local GOLD = { 0.89, 0.71, 0.29 }
+local frame
+
+local function build()
+    frame = CreateFrame("Frame", "BlatoPartyFeatures", UIParent)
+    frame:SetSize(560, 520)
+    frame:SetPoint("CENTER", UIParent, "CENTER", 0, 20)
+    frame:SetFrameStrata("DIALOG")
+    frame:SetMovable(true)
+    frame:EnableMouse(true)
+    if frame.RegisterForDrag then frame:RegisterForDrag("LeftButton") end
+    frame:SetScript("OnDragStart", function(self) self:StartMoving() end)
+    frame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
+    frame.bg = frame:CreateTexture(nil, "BACKGROUND")
+    frame.bg:SetAllPoints()
+    frame.bg:SetColorTexture(0.07, 0.08, 0.105, 0.97)
+    frame.edge = frame:CreateTexture(nil, "BORDER")
+    frame.edge:SetPoint("TOPLEFT"); frame.edge:SetPoint("TOPRIGHT"); frame.edge:SetHeight(3)
+    frame.edge:SetColorTexture(GOLD[1], GOLD[2], GOLD[3], 1)
+    local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    title:SetPoint("TOPLEFT", 16, -18)
+    title:SetText("Bláto - Functionality")
+    local close = CreateFrame("Button", nil, frame)
+    close:SetSize(24, 24)
+    close:SetPoint("TOPRIGHT", -6, -8)
+    local cx = close:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    cx:SetPoint("CENTER"); cx:SetText("x"); cx:SetTextColor(0.55, 0.58, 0.63)
+    close:SetScript("OnClick", function() frame:Hide() end)
+
+    local sf = CreateFrame("ScrollFrame", "BlatoPartyFeaturesScroll", frame, "UIPanelScrollFrameTemplate")
+    sf:SetPoint("TOPLEFT", 16, -50)
+    sf:SetPoint("BOTTOMRIGHT", -34, 16)
+    local content = CreateFrame("Frame", nil, sf)
+    content:SetSize(500, 10)
+    sf:SetScrollChild(content)
+    -- per group: a gold heading with a thin line under it, then the points with a gold bullet (decision 257).
+    -- Each heading hangs below the group before it, so the game does the spacing however the lines wrap.
+    local W = 500
+    frame.heads, frame.bodies = {}, {}
+    local prev
+    for i, sec in ipairs(FE.SECTIONS) do
+        local h = content:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        if prev then h:SetPoint("TOPLEFT", prev, "BOTTOMLEFT", -10, -18) else h:SetPoint("TOPLEFT", content, "TOPLEFT", 0, 0) end
+        h:SetText(sec[1])
+        h:SetTextColor(GOLD[1], GOLD[2], GOLD[3])
+        local cnt = content:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+        cnt:SetPoint("BOTTOMRIGHT", h, "BOTTOMLEFT", W, 0)
+        cnt:SetText(#sec[2] == 1 and "1 feature" or (#sec[2] .. " features"))
+        local line = content:CreateTexture(nil, "ARTWORK")
+        line:SetPoint("TOPLEFT", h, "BOTTOMLEFT", 0, -4)
+        line:SetSize(W, 1)
+        line:SetColorTexture(GOLD[1], GOLD[2], GOLD[3], 0.35)
+        local lines = {}
+        for _, t in ipairs(sec[2]) do lines[#lines + 1] = "|cffe3b54a\226\128\162|r  " .. t end    -- a gold bullet
+        local body = content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        body:SetPoint("TOPLEFT", h, "BOTTOMLEFT", 10, -11)
+        body:SetWidth(W - 10)
+        body:SetJustifyH("LEFT")
+        if body.SetSpacing then body:SetSpacing(4) end
+        body:SetText(table.concat(lines, "\n"))
+        frame.heads[i], frame.bodies[i] = h, body
+        prev = body
+    end
+    -- the scroll height: measured once the window is on screen (an estimate until then)
+    content:SetHeight(#FE.LIST * 34 + #FE.SECTIONS * 40)
+    frame:SetScript("OnShow", function()
+        local top, bottom = content:GetTop(), prev:GetBottom()
+        top, bottom = tonumber((top)), tonumber((bottom))
+        if top and bottom and top > bottom then content:SetHeight(top - bottom + 10) end
+    end)
+    if UISpecialFrames then table.insert(UISpecialFrames, "BlatoPartyFeatures") end
+    frame:Hide()
+end
+
+function FE:Show() if not frame then build() end; frame:Show() end
+function FE:Toggle()
+    if frame and frame:IsShown() then frame:Hide() else FE:Show() end
+end
+function FE:Frame() return frame end
+
+OMQ:RegisterCommand("features", function() FE:Toggle() end, "list everything the addon does")
