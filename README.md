@@ -1,56 +1,56 @@
 # Bláto Journal
 
 A World of Warcraft addon for **WoW Forever**, made for a party of three friends who level together.
-Deník postavy a všechny „partové" funkce v jednom okně – každá funkce je tlačítko.
+A character journal and every party feature in one window, each feature a button.
 
-## Co umí
+## What it does
 
-Okno **Bláto Journal** (ikonka u minimapy nebo `/blato`) má klasický vzhled starého WoW (dialogový rámeček, pergamen; v nastavení jde přepnout na moderní) a tyto záložky:
+The **Bláto Journal** window (minimap button or `/blato`) has the look of the classic game (the old dialog frame and a parchment page; the options can switch it to a modern style) and these tabs:
 
-| Záložka | Co tam je |
+| Tab | What is on it |
 |---|---|
-| **Commands** | Všechny funkce party jako tlačítka: statistiky večera (i kdo byl jak dlouho AFK), sdílení questů, šipky k trenérům a vendorům, místo srazu, alert karty, Group Check před dungeonem, threat, aukce a crafting, sázky, hlasování „One more quest?" a nastavení. Přepínače mají zaškrtávátko, najetí myší ukáže, co tlačítko dělá a jaký je to příkaz. |
-| **Dungeons** | Addon **Dungeon Journal** od Exehn (CurseForge) (bossové, loot, questy, mapy) přímo v okně journalu. Instaluje se zvlášť, viz níže. |
-| **Journey** | Co jste dokázali vy tři spolu: čas, společné questy, dungeony (runy, dokončení, bossové) a společné „poprvé“. Pod tím vlastní cesta postavy po levelech. |
-| Places | Navštívené zóny a dungeony. |
-| **Quests** | Odevzdané questy a u každého, kdo z vás tří ho splnil (✓), nesplnil (✗) nebo se ještě neví (?). Nahoře questy, které kamarádi mají a ty ne. |
-| Notes | Poznámky s připomínkami („až vejdu do Undercity“). |
+| **Commands** | Every party feature as a button: tonight's statistics (including who was AFK and for how long), quest sharing, arrows to trainers and vendors, a meeting point, alert cards, the Group Check before a dungeon, threat, auction house and crafting helpers, bets, the "One more quest?" vote and the options. Switches have a check box; hovering a button shows what it does and its command. |
+| **Dungeons** | The addon **Dungeon Journal** by Exehn (CurseForge): bosses, loot, quests and maps, shown right inside the journal window. It is installed on its own, see below. |
+| **Journey** | What the three of you have done together: time, shared quests, dungeons (runs, clears, bosses) and the firsts you shared. Below that, your own character's path, level by level. |
+| Places | The zones and dungeons you have visited. |
+| **Quests** | The quests you handed in, and for each one who of the three of you has done it (✓), has not (✗) or is not known yet (?). On top: quests your friends have done and you have not. |
+| Notes | Notes with reminders ("when I enter Undercity"). |
 
-Většina funkcí party ožije, až když addon mají všichni tři. Spoluhráči jsou ti dva, se kterými máš nejvíc společného času ve skupině.
+Most party features come alive when all three of you run the addon. Your party mates are the two players you have spent the most time grouped with.
 
-## Instalace
+## Install
 
-1. Stáhni nejnovější `BlatoJournal_vX.Y.Z.zip` z [Releases](../../releases).
-2. Rozbal ho do složky `Interface/AddOns` instalace WoW Forever (vznikne `Interface/AddOns/BlatoJournal`).
-3. Pro záložku Dungeons si zvlášť nainstaluj **Dungeon Journal** od Exehn z CurseForge (edici pro Forever). Jeho kód v tomhle repu není, protože nemá licenci, která by to dovolila.
-4. Ve hře `/reload`.
+1. Download the latest `BlatoJournal_vX.Y.Z.zip` from [Releases](../../releases).
+2. Unzip it into the `Interface/AddOns` folder of your WoW Forever installation (this gives `Interface/AddOns/BlatoJournal`).
+3. For the Dungeons tab, install **Dungeon Journal** by Exehn from CurseForge separately (the edition for Forever). Its code is not in this repository: it has no license that would allow that.
+4. Type `/reload` in the game.
 
-## Příkazy
+## Commands
 
-- `/blato` – otevře záložku Commands
-- `/blato vote` – hlasování „One more quest?“ / „Bed time“
-- `/blato help` – všechny příkazy party
-- `/bj` nebo `/journal` – otevře deník, `/note` – rychlá poznámka
+- `/blato` opens the Commands tab
+- `/blato vote` starts the "One more quest?" / "Bed time" vote
+- `/blato help` lists every party command
+- `/bj` or `/journal` opens the journal, `/note` writes a quick note
 
-## Odkud to je
+## Where it comes from
 
-Bláto Journal spojuje dva addony a upravuje je:
+Bláto Journal joins two addons and changes them:
 
-- **ForeverJournal** od Ugge Zen (MIT, viz [LICENSES/ForeverJournal-MIT.txt](LICENSES/ForeverJournal-MIT.txt)) – deník, okno a jeho záložky (`BlatoJournal/Journal`, `Media`, `Art`, `Setup`).
-- **One More Quest** od MadDadVibe (GPL-3.0) – funkce party (`BlatoJournal/Party`). Používá data z [Questie / QuestieDB](https://github.com/Questie/QuestieDB) (GPL-3.0) a prahy skill-upů ze [SkillUp Forever](https://github.com/cjber/skillup-forever) od cjber (GPL-3.0).
+- **ForeverJournal** by Ugge Zen (MIT, see [LICENSES/ForeverJournal-MIT.txt](LICENSES/ForeverJournal-MIT.txt)): the journal, its window and tabs (`BlatoJournal/Journal`, `Media`, `Art`, `Setup`).
+- **One More Quest** by MadDadVibe (GPL-3.0): the party features (`BlatoJournal/Party`). It uses data from [Questie / QuestieDB](https://github.com/Questie/QuestieDB) (GPL-3.0) and the skill-up thresholds of [SkillUp Forever](https://github.com/cjber/skillup-forever) by cjber (GPL-3.0).
 
-Změny proti originálům:
+Changes from the originals:
 
-- nová záložka **Commands** s tlačítky pro všechny funkce party (`BlatoJournal/Blato.lua`, `RenderBlato` v `Journal/UI.lua`);
-- klasický vzhled (`UI.Chrome` v `Journal/UI.lua`, vlastní pergamen `Media/Parchment.tga`);
-- záložka **Dungeons**, která zobrazí samostatně nainstalovaný Dungeon Journal v okně journalu;
-- Journey o party tří (`J.Together` v `Journal/Fellowship.lua`) a u questů, kdo je splnil (`Together.lua`, zprávy JQD/JQH/JQA);
-- bez záložek Goals a Fellowship (data o spoluhráčích se dál sbírají);
-- statistika „Time AFK“ v Tonight in numbers;
-- vynechané „pohodlí“ z One More Quest: automatické přijímání a odevzdávání questů, Shift-klik heal, Dad UI, chat filtr a průvodce;
-- přejmenované globální názvy, uložená data a příkazy (`/blato`, `/bj`), takže Bláto Journal může být nainstalovaný vedle originálů;
-- simulátor (`/blato sim`) má výchozí 2 spoluhráče a nikdy neposílá skutečnou poštu.
+- a new **Commands** tab with buttons for every party feature (`BlatoJournal/Blato.lua`, `BJ.RenderCommands` in `Journal/UI.lua`);
+- the classic look (`UI.Chrome` in `Journal/UI.lua`, its own parchment `Media/Parchment.tga`);
+- a **Dungeons** tab that shows the separately installed Dungeon Journal inside the journal window;
+- a Journey about the party of three (`J.Together` in `Journal/Fellowship.lua`) and, on the Quests page, who has done each quest (`Together.lua`, messages JQD/JQH/JQA);
+- no Goals and no Fellowship tab (party mates are still recorded);
+- "Time AFK" in tonight's statistics;
+- left out from One More Quest: automatic quest accepting and turn-in, Shift-click heals, the Dad UI, the chat filter and the guided tour;
+- renamed globals, saved variables and commands (`/blato`, `/bj`), so Bláto Journal can be installed next to the originals;
+- the simulator (`/blato sim`) starts with 2 party mates and never sends real mail.
 
-## Licence
+## License
 
-GPL-3.0, viz [LICENSE](LICENSE). Části z ForeverJournal jsou pod MIT licencí, jejíž text je v [LICENSES/ForeverJournal-MIT.txt](LICENSES/ForeverJournal-MIT.txt).
+GPL-3.0, see [LICENSE](LICENSE). The parts from ForeverJournal are under the MIT license, whose text is in [LICENSES/ForeverJournal-MIT.txt](LICENSES/ForeverJournal-MIT.txt).
