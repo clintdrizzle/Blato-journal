@@ -1,4 +1,4 @@
-# Bláto Journal
+<p align="center"><img src=".github/banner.jpg" alt="Bláto Journal: three friends made an addon to get the most out of their LAN party" width="100%"></p>
 
 Three friends made this World of Warcraft addon to get the most out of their Bláto LAN party in **WoW Forever**.
 If you are three friends playing your own LAN party together, feel free to use it.
