@@ -421,47 +421,50 @@ local function PlaceScroll()
     content:SetWidth(CW + 4)
 end
 
+-- Bláto Journal's own page code lives in the table BJ: this file's main chunk is close to Lua's limit of 200
+-- local variables, so the additions take one.
+local BJ = {}
+
 -- Classic chrome (Bláto Journal) ------------------------------------------------------------------------
 -- The classic style swaps the modern window art for the old game's dialog frame: dark marble, the grey-gold
 -- border (the client's own BACKDROP_DIALOG_32_32 files) and the title on the header plate. The page inset moves
 -- inside that border. Picking another style brings the modern art and the old positions back.
-local MODERN_ART = { "NineSlice", "Bg", "TopTileStreaks", "PortraitContainer", "portrait", "TitleContainer", "TitleBg" }
-local classic, savedPoints
-local function SavePoints(f)
+BJ.MODERN_ART = { "NineSlice", "Bg", "TopTileStreaks", "PortraitContainer", "portrait", "TitleContainer", "TitleBg" }
+function BJ.SavePoints(f)
     local pts = {}
     for i = 1, f:GetNumPoints() do pts[i] = { f:GetPoint(i) } end
     return pts
 end
-local function RestorePoints(f, pts)
+function BJ.RestorePoints(f, pts)
     if not (f and pts and #pts > 0) then return end
     f:ClearAllPoints()
     for _, p in ipairs(pts) do f:SetPoint(unpack(p)) end
 end
 function UI.Chrome(on)
-    if on and not classic then
-        classic = CreateFrame("Frame", nil, win, BackdropTemplateMixin and "BackdropTemplate" or nil)
-        classic:SetAllPoints(win)
-        classic:SetFrameLevel(win:GetFrameLevel())   -- under the inset and the buttons
-        if classic.SetBackdrop then
-            classic:SetBackdrop(BACKDROP_DIALOG_32_32 or { bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+    if on and not BJ.classic then
+        BJ.classic = CreateFrame("Frame", nil, win, BackdropTemplateMixin and "BackdropTemplate" or nil)
+        BJ.classic:SetAllPoints(win)
+        BJ.classic:SetFrameLevel(win:GetFrameLevel())   -- under the inset and the buttons
+        if BJ.classic.SetBackdrop then
+            BJ.classic:SetBackdrop(BACKDROP_DIALOG_32_32 or { bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
                 edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border", tile = true, tileEdge = true, tileSize = 32, edgeSize = 32,
                 insets = { left = 11, right = 12, top = 12, bottom = 11 } })
         end
-        local plate = classic:CreateTexture(nil, "ARTWORK")
+        local plate = BJ.classic:CreateTexture(nil, "ARTWORK")
         plate:SetSize(300, 64)
         plate:SetPoint("TOP", 0, 12)
         local hasPlate = plate:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Header")
         plate:SetShown(hasPlate and true or false)
-        classic.title = classic:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        classic.title:SetPoint("TOP", classic, "TOP", 0, hasPlate and -2 or -16)
-        classic.title:SetText("Bláto Journal")
+        BJ.classic.title = BJ.classic:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        BJ.classic.title:SetPoint("TOP", BJ.classic, "TOP", 0, hasPlate and -2 or -16)
+        BJ.classic.title:SetText("Bláto Journal")
         local close = Child(win, "CloseButton")
-        savedPoints = { inset = inset ~= win and SavePoints(inset), close = close and SavePoints(close),
-            back = UI.backButton and SavePoints(UI.backButton) }
+        BJ.savedPoints = { inset = inset ~= win and BJ.SavePoints(inset), close = close and BJ.SavePoints(close),
+            back = UI.backButton and BJ.SavePoints(UI.backButton) }
     end
-    if not classic then return end   -- never was classic: nothing to undo
-    classic:SetShown(on)
-    for _, key in ipairs(MODERN_ART) do local c = Child(win, key); if c then c:SetShown(not on) end end
+    if not BJ.classic then return end   -- never was classic: nothing to undo
+    BJ.classic:SetShown(on)
+    for _, key in ipairs(BJ.MODERN_ART) do local c = Child(win, key); if c then c:SetShown(not on) end end
     if inset ~= win then for _, key in ipairs({ "NineSlice", "Bg" }) do local c = Child(inset, key); if c then c:SetShown(not on) end end end
     local close = Child(win, "CloseButton")
     if on then
@@ -473,9 +476,9 @@ function UI.Chrome(on)
         if close then close:ClearAllPoints(); close:SetPoint("TOPRIGHT", win, "TOPRIGHT", -5, -5) end
         if UI.backButton then UI.backButton:ClearAllPoints(); UI.backButton:SetPoint("TOPLEFT", win, "TOPLEFT", 14, -7) end
     else
-        RestorePoints(inset ~= win and inset or nil, savedPoints.inset)
-        RestorePoints(close, savedPoints.close)
-        RestorePoints(UI.backButton, savedPoints.back)
+        BJ.RestorePoints(inset ~= win and inset or nil, BJ.savedPoints.inset)
+        BJ.RestorePoints(close, BJ.savedPoints.close)
+        BJ.RestorePoints(UI.backButton, BJ.savedPoints.back)
     end
 end
 
@@ -1079,11 +1082,11 @@ for i, t in ipairs(TABS) do
 end
 -- Bláto Journal: in the classic style the tabs are the old character window's tabs (one texture cut in three),
 -- text only, gold and white; where the client lacks that art they keep the modern look.
-local CLASSIC_TAB = { [true] = "Interface\\PaperDollInfoFrame\\UI-Character-ActiveTab",
+BJ.CLASSIC_TAB = { [true] = "Interface\\PaperDollInfoFrame\\UI-Character-ActiveTab",
     [false] = "Interface\\PaperDollInfoFrame\\UI-Character-InactiveTab" }
-local function ClassicTab(tab, on)
-    if not tab.l:SetTexture(CLASSIC_TAB[on]) then return false end
-    tab.m:SetTexture(CLASSIC_TAB[on]); tab.r:SetTexture(CLASSIC_TAB[on])
+function BJ.ClassicTab(tab, on)
+    if not tab.l:SetTexture(BJ.CLASSIC_TAB[on]) then return false end
+    tab.m:SetTexture(BJ.CLASSIC_TAB[on]); tab.r:SetTexture(BJ.CLASSIC_TAB[on])
     tab.l:SetTexCoord(0, 0.15625, 0, 1); tab.m:SetTexCoord(0.15625, 0.84375, 0, 1); tab.r:SetTexCoord(0.84375, 1, 0, 1)
     return true
 end
@@ -1091,7 +1094,7 @@ local function SelectTab()
     local wantClassic = UI.usedStyle == "classic"
     for i, tab in ipairs(tabs) do
         local on = tab.key == current
-        local old = wantClassic and ClassicTab(tab, on)
+        local old = wantClassic and BJ.ClassicTab(tab, on)
         tab.l:SetWidth(old and 20 or 35); tab.r:SetWidth(old and 20 or 37)
         tab.icon:SetShown(not old)
         tab.label:ClearAllPoints()
@@ -1420,7 +1423,7 @@ local function Body(list, x, timeOnly, key)
 end
 
 -- Bláto Journal: your own path, under the party's part of the Journey page (RenderJourney below)
-local function RenderMyPath()
+function BJ.RenderMyPath()
     local levels = {}
     for l in pairs(H.levels) do levels[#levels + 1] = l end
     table.sort(levels, function(a, b) return a > b end)
@@ -1574,7 +1577,7 @@ end
 
 -- Bláto Journal: the Journey page is about the three of you first: time, quests and dungeons together (runs,
 -- clears, bosses) and the firsts you shared. Your own path follows, as the journal kept it before.
-local DUNGEON_ICON = "Interface/Icons/INV_Misc_Key_03"
+BJ.DUNGEON_ICON = "Interface/Icons/INV_Misc_Key_03"
 local function RenderJourney()
     BarButtons({})
     local t = J.Together()
@@ -1585,7 +1588,7 @@ local function RenderJourney()
         Tiles({
             { "time", J.Dur(t.time), "all three grouped" },
             { "Interface/Icons/INV_Scroll_03", tostring(#t.quests), "quests together" },
-            { DUNGEON_ICON, tostring(t.runs), "dungeon runs" },
+            { BJ.DUNGEON_ICON, tostring(t.runs), "dungeon runs" },
             { "kills", tostring(t.cleared), "dungeons cleared" },
         })
 
@@ -1595,7 +1598,7 @@ local function RenderJourney()
                 local top, h = y, 62
                 Box(0, top, CW, h)
                 Hotspot(0, top, CW, h, function() UI.OpenPlace("dungeon:" .. d.name) end, "Open " .. d.name)
-                Icon(d.icon or DUNGEON_ICON, 12, top - 13, 36)
+                Icon(d.icon or BJ.DUNGEON_ICON, 12, top - 13, 36)
                 local title = Text(d.name, "chapter", 58, 0, true)
                 title:SetPoint("TOPLEFT", 58, top - 8)
                 if d.cleared > 0 then Chip("CLEARED", 58 + title:GetStringWidth() + 10, top - 9, "Badge") end
@@ -1618,7 +1621,7 @@ local function RenderJourney()
             end
         end
         for _, d in ipairs(t.dungeons) do
-            moments[#moments + 1] = { t = d.first, kind = "dungeon", icon = d.icon or DUNGEON_ICON,
+            moments[#moments + 1] = { t = d.first, kind = "dungeon", icon = d.icon or BJ.DUNGEON_ICON,
                 text = ("First time in %s together"):format(d.name), sub = ("level %d"):format(d.runs[1].level or 0) }
             local c = d.firstClear
             if c then
@@ -1646,7 +1649,7 @@ local function RenderJourney()
             if #t.quests > QUESTS_SHOWN then Text(("And %d more on the Quests page."):format(#t.quests - QUESTS_SHOWN), "ink") end
         end
     end
-    if Header("journey:mine", "My own path") then RenderMyPath() end
+    if Header("journey:mine", "My own path") then BJ.RenderMyPath() end
 end
 
 -- Places -----------------------------------------------------------------------------------
@@ -1937,92 +1940,7 @@ local function RenderPlaces()
 end
 function UI.OpenPlace(zone) openPlace = zone; UI.Show("places") end
 
--- Goals ------------------------------------------------------------------------------------
--- Picker tiles: type, name, description, icon, and which questions the form asks.
-local GOAL_KINDS = {
-    { kind = "item", name = "Collect an item", desc = "Gather ore, herbs, cloth, or find one special item.", icon = "Interface/Icons/INV_Misc_Bag_08", item = true, count = "How many?" },
-    { kind = "kills", name = "Defeat enemies", desc = "Any creature that gives experience.", icon = "Interface/Icons/Ability_DualWield", count = "How many?" },
-    { kind = "creature", name = "Hunt a creature", desc = "One kind, like Mottled Worg. Counts when your target dies.", icon = "Interface/Icons/Ability_Tracking", text = "Which creature?", count = "How many?", suggest = "creatures" },
-    { kind = "xp", name = "Gain experience", desc = "From kills, quests and exploring.", icon = "Interface/Icons/Spell_Holy_SealOfWisdom", count = "How much experience?", step = 100 },
-    { kind = "gold", name = "Earn gold", desc = "From loot, quests and sales.", icon = "Interface/Icons/INV_Misc_Coin_02", count = "How much gold?" },
-    { kind = "quests", name = "Complete quests", desc = "Turn in a number of quests.", icon = "Interface/Icons/INV_Scroll_03", count = "How many quests?" },
-    { kind = "runs", name = "Run dungeons", desc = "Any dungeon counts.", icon = "Interface/Icons/INV_Misc_Key_03", count = "How many runs?" },
-    { kind = "dungeon", name = "Run a dungeon", desc = "One particular dungeon, once or many times.", icon = "Interface/Icons/INV_Misc_Bone_HumanSkull_01", text = "Which dungeon?", count = "How many runs?", suggest = "dungeons" },
-    { kind = "level", name = "Reach a level", desc = "A milestone to look forward to.", icon = "Interface/Icons/Spell_Holy_HolyBolt", count = "Which level?" },
-    { kind = "zone", name = "Visit a place", desc = "A zone, or a spot inside one like Frostmane Hold.", icon = "Interface/Icons/INV_Misc_Map_01", text = "Which zone or place?" },
-    { kind = "skill", name = "Raise a profession", desc = "Reach a skill level in First Aid, Mining, Cooking...", icon = "Interface/Icons/INV_Pick_02", text = "Which profession?", count = "Which skill level?", step = 5, suggest = "skills" },
-    { kind = "todo", name = "Something else", desc = "A to-do you tick off yourself.", icon = "Interface/Icons/INV_Misc_Note_01", text = "What do you want to do?" },
-}
-local KIND_ICON = {}
-for _, k in ipairs(GOAL_KINDS) do KIND_ICON[k.kind] = k.icon end
-local goalView, goalKind = "list", nil
-local form = { item = nil }
-
--- Form widgets live on the page and are only shown by the form view.
-local itemSlot = Persist(CreateFrame("Button", nil, content))
-itemSlot:SetSize(40, 40)
-itemSlot.bg = itemSlot:CreateTexture(nil, "BACKGROUND")
-itemSlot.bg:SetAllPoints()
-itemSlot.bg:SetTexture("Interface/PaperDoll/UI-Backpack-EmptySlot")
-itemSlot.icon = itemSlot:CreateTexture(nil, "ARTWORK")
-itemSlot.icon:SetAllPoints()
-UI.DressIcon(itemSlot, itemSlot.icon, itemSlot.bg)
-itemSlot.bg:SetTexCoord(0.06, 0.94, 0.06, 0.94)
-itemSlot:SetHighlightTexture("Interface/Buttons/ButtonHilight-Square", "ADD")
-local textBox = Persist(Kit.Make("EditBox", content, "InputBoxTemplate"))
-textBox:SetSize(260, 22)
-textBox:SetAutoFocus(false)
-local countBox = Persist(Kit.Make("EditBox", content, "InputBoxTemplate"))
-countBox:SetSize(50, 22)
-countBox:SetAutoFocus(false)
-countBox:SetNumeric(true)
-countBox:SetJustifyH("CENTER")
-countBox:SetMaxLetters(5)
--- Quantity arrows like the profession window's, and the mouse wheel over the box.
-local CurrentStep   -- set below: the chosen goal type's step size
-local function Step(delta)
-    local unit = CurrentStep and CurrentStep() or 1
-    local n = math.max(1, (tonumber(countBox:GetText()) or 1) + delta * unit * (IsShiftKeyDown() and 10 or 1))
-    countBox:SetText(tostring(math.min(n, 99999)))
-end
-local function Arrow(textureBase, delta)
-    local b = Persist(CreateFrame("Button", nil, content))
-    b:SetSize(24, 24)
-    b:SetNormalTexture(textureBase .. "-Up")
-    b:SetPushedTexture(textureBase .. "-Down")
-    b:SetHighlightTexture("Interface/Buttons/UI-Common-MouseHilight", "ADD")
-    b:SetScript("OnClick", function() Step(delta); PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON) end)
-    return b
-end
-local countDown = Arrow("Interface/Buttons/UI-SpellbookIcon-PrevPage", -1)
-local countUp = Arrow("Interface/Buttons/UI-SpellbookIcon-NextPage", 1)
-countBox:EnableMouseWheel(true)
-countBox:SetScript("OnMouseWheel", function(_, delta) Step(delta) end)
-local formError
-
-local function SetFormItem(link)
-    local id, name = J.ResolveItem(link)
-    if not id then return end
-    form.item = link:find("item:") and link or tostring(id)
-    form.itemName = name
-    itemSlot.icon:SetTexture((C_Item and C_Item.GetItemIconByID and C_Item.GetItemIconByID(id)) or (GetItemIcon and GetItemIcon(id)))
-    textBox:SetText("")
-    UI.Render()
-end
-local function TakeCursorItem()
-    local kind, id, link = GetCursorInfo()
-    if kind == "item" then SetFormItem(link or tostring(id)); ClearCursor(); return true end
-end
-itemSlot:SetScript("OnReceiveDrag", TakeCursorItem)
-itemSlot:SetScript("OnClick", function() if not TakeCursorItem() and form.item then form.item, form.itemName = nil, nil; itemSlot.icon:SetTexture(nil); UI.Render() end end)
-itemSlot:SetScript("OnEnter", function(self)
-    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-    if form.item and tonumber(form.item) == nil and GameTooltip.SetHyperlink then GameTooltip:SetHyperlink(form.item)
-    else GameTooltip:SetText("Drop an item here", 1, 1, 1); GameTooltip:AddLine("Drag it from your bags, or shift-click it.", nil, nil, nil, true) end
-    GameTooltip:Show()
-end)
-itemSlot:SetScript("OnLeave", GameTooltip_Hide)
--- shift-clicking an item while the item form is open puts it in the slot
+-- Bláto Journal: no Goals page, its code is gone. Shift-clicked links still go into the note boxes.
 -- Clients route shift-clicked links through different functions, so listen on every one that exists.
 UI.linkBoxes = {}   -- note boxes that take shift-clicked links (added below)
 local lastLink, lastLinkTime = nil, 0
@@ -2034,10 +1952,6 @@ local function OnLink(link)
     for _, box in ipairs(UI.linkBoxes) do
         if box:HasFocus() then box:Insert(link); lastLink, lastLinkTime = link, now; return end
     end
-    if win:IsShown() and current == "goals" and goalView == "form" and goalKind and goalKind.item
-        and link:find("item:") and link ~= form.item then
-        SetFormItem(link)
-    end
 end
 if ChatEdit_InsertLink then hooksecurefunc("ChatEdit_InsertLink", OnLink) end
 if ChatFrameUtil and ChatFrameUtil.InsertLink then hooksecurefunc(ChatFrameUtil, "InsertLink", OnLink) end
@@ -2045,269 +1959,6 @@ if HandleModifiedItemClick then
     hooksecurefunc("HandleModifiedItemClick", function(link)
         if not IsModifiedClick or IsModifiedClick("CHATLINK") then OnLink(link) end
     end)
-end
-
-local function SubmitGoal()
-    local k = goalKind
-    if not k then return end
-    local target = k.item and (form.item or textBox:GetText()) or textBox:GetText()
-    local g, err = J.AddGoal(k.kind, target, countBox:GetText())
-    if g then
-        goalView, goalKind, form.item, form.itemName = "list", nil, nil, nil
-        textBox:SetText(""); countBox:SetText(""); formError = nil
-        textBox:ClearFocus(); countBox:ClearFocus()
-        UI.Render()
-    else
-        formError = err
-        UI.Render()
-    end
-end
-textBox:SetScript("OnEnterPressed", SubmitGoal)
-countBox:SetScript("OnEnterPressed", SubmitGoal)
-textBox:SetScript("OnEscapePressed", textBox.ClearFocus)
-countBox:SetScript("OnEscapePressed", countBox.ClearFocus)
-
-CurrentStep = function() return goalKind and goalKind.step or 1 end
-
-local function OpenForm(k)
-    goalView, goalKind, formError = "form", k, nil
-    form.item, form.itemName = nil, nil
-    itemSlot.icon:SetTexture(nil)
-    textBox:SetText("")
-    countBox:SetText(k.kind == "level" and tostring(J.Level() + 1) or k.kind == "xp" and "1000" or k.kind == "skill" and "75" or "1")
-    UI.Render()
-    if k.text then textBox:SetFocus() end
-end
-
--- A short line beside a goal's name: how far off it is, or where it comes from.
-local function GoalHint(g)
-    if g.kind == "level" then local n = g.need - J.Level(); return n > 0 and (n == 1 and "one level to go" or (n .. " levels to go")) or "" end
-    if g.kind == "zone" then return "a place to find" end
-    if g.kind == "item" then return "counted in your bags" end
-    if g.kind == "skill" then return "profession" end
-    if g.kind == "todo" then return "tick it off yourself" end
-    return "since " .. J.Date(g.created or time())
-end
-local function GoalIcon(g)
-    return g.kind == "item" and ((C_Item and C_Item.GetItemIconByID and C_Item.GetItemIconByID(g.target)) or (GetItemIcon and GetItemIcon(g.target)))
-        or KIND_ICON[g.kind]
-end
-
--- Active goals as cards with a ring, the name and a skill bar; reached goals as a row of medals.
-local function RenderGoalList()
-    if archiveOpen.goal then return RenderArchive("goal") end
-    BarButtons({ { "New goal", function() goalView = "pick"; UI.Render() end } })
-    local active, done = {}, {}
-    for _, g in ipairs(H.goals) do
-        if g.archived or not Find.Match(g.label, g.text) then -- in the archive, or not what you searched for
-        elseif g.done then done[#done + 1] = g else active[#active + 1] = g end
-    end
-    local titleTop = y
-    PageHead("Goals", #active == 0 and "Nothing to work towards yet. Start one with New goal below."
-        or (#active == 1 and "One thing to work towards." or (#active .. " things to work towards.")))
-    ArchiveLink("goal", titleTop)
-    Find.Field("goals", 0, y, CW, "Search goals")
-    Gap(40)
-    for _, g in ipairs(active) do
-        local top = y
-        local have, need = J.GoalProgress(g)
-        Box(0, top, CW, 64)
-        if g.kind == "todo" then
-            Ring(10, top - 10, 44, nil, true)
-            Check(20, top - 20, false, function() J.TickTodo(g.id) end)
-        else
-            Ring(10, top - 10, 44, nil, true, GoalIcon(g))
-        end
-        local name = Text(g.label, "chapter", 68, 70, true)
-        name:SetPoint("TOPLEFT", 68, top - 10)
-        name:SetWordWrap(false)
-        local hint = Text(GoalHint(g), "ink", 68, 0, true)
-        hint:SetPoint("TOPLEFT", 68 + math.min(name:GetStringWidth(), CW - 200) + 10, top - 13)
-        if g.kind ~= "todo" then Bar(68, top - 38, CW - 68 - 14, have, need) end
-        local archive = Link("Archive", 8, top - 8, function() J.SetArchived("goal", g.id, true) end)
-        y = top - 64
-        Entry(top, { archive })
-        Gap(10)
-    end
-    if #done > 0 and Header("goals:reached", "Reached", tostring(#done)) then
-        Link("Archive all", 0, y + 28, function() J.ClearDoneGoals() end)
-        table.sort(done, function(a, b) return (a.doneAt or 0) > (b.doneAt or 0) end)
-        local per = 5
-        local w = math.floor(CW / per)
-        for i, g in ipairs(done) do
-            local col = (i - 1) % per
-            local top = y - math.floor((i - 1) / per) * 124
-            local x = col * w
-            Ring(x + w / 2 - 22, top, 44, nil, true, GoalIcon(g))
-            local label = Text(g.label, "small", x + 4, 0, true)
-            label:SetPoint("TOPLEFT", x + 4, top - 50)
-            label:SetWidth(w - 8)
-            label:SetJustifyH("CENTER")
-            local d = Text(J.Date(g.doneAt or g.created), "ink", x + 4, 0, true)
-            d:SetPoint("TOPLEFT", x + 4, top - 54 - label:GetStringHeight())
-            d:SetWidth(w - 8)
-            d:SetJustifyH("CENTER")
-            local e = { Link(g.kind == "todo" and "Undo" or "Archive", CW - x - w / 2 - 26, top - 100, function()
-                if g.kind == "todo" then J.TickTodo(g.id) else J.SetArchived("goal", g.id, true) end
-            end) }
-            local hold = y; y = top - 118; Entry(top, e); y = hold
-            -- Entry spans the whole width; narrow it to this medal
-            local last = entries[#entries]
-            last:ClearAllPoints(); last:SetPoint("TOPLEFT", x, top + 2); last:SetSize(w, 120)
-        end
-        y = y - math.ceil(#done / per) * 124
-    end
-end
-
-local function RenderGoalPick()
-    BarButtons({ { "Back", function() goalView = "list"; UI.Render() end } })
-    Text("A new goal", "title")
-    Text("What would you like to work towards?", "dim")
-    Gap(4)
-    local tileW = math.floor((CW - 10) / 2)
-    for i, k in ipairs(GOAL_KINDS) do
-        local col, row = (i - 1) % 2, math.floor((i - 1) / 2)
-        local top = y - row * 64
-        local tile = Next("tile", function()
-            local b = CreateFrame("Button", nil, content)
-            b.bg = b:CreateTexture(nil, "BACKGROUND")
-            b.bg:SetAllPoints()
-            b.hl = b:CreateTexture(nil, "HIGHLIGHT")
-            b.hl:SetAllPoints()
-            b.icon = b:CreateTexture(nil, "ARTWORK")
-            b.icon:SetSize(40, 40)
-            b.icon:SetPoint("LEFT", 8, 0)
-            UI.DressIcon(b, b.icon)
-            b.name = b:CreateFontString(nil, "OVERLAY")
-            b.name:SetPoint("TOPLEFT", b.icon, "TOPRIGHT", 10, -2)
-            b.name:SetJustifyH("LEFT")
-            b.desc = b:CreateFontString(nil, "OVERLAY")
-            b.desc:SetPoint("TOPLEFT", b.name, "BOTTOMLEFT", 0, -3)
-            b.desc:SetJustifyH("LEFT")
-            return b
-        end)
-        tile:SetSize(tileW, 56)
-        tile:SetPoint("TOPLEFT", col * (tileW + 10), top)
-        local c = Ink("head")
-        tile.bg:SetColorTexture(c[1], c[2], c[3], parchment and 0.08 or 0.25)
-        tile.hl:SetColorTexture(c[1], c[2], c[3], parchment and 0.12 or 0.2)
-        tile.icon:SetTexture(k.icon)
-        Style(tile.name, "head"); tile.name:SetText(k.name)
-        Style(tile.desc, "small"); tile.desc:SetWidth(tileW - 66); tile.desc:SetText(k.desc)
-        tile:SetScript("OnClick", function() OpenForm(k) end)
-    end
-    y = y - math.ceil(#GOAL_KINDS / 2) * 64
-end
-
-local function RenderGoalForm()
-    local k = goalKind
-    BarButtons({ { "Set goal", SubmitGoal }, { "Back", function() goalView = "pick"; formError = nil; UI.Render() end } })
-    Icon(k.icon, 0, y, 40)
-    Text(k.name, "title", 50, 0, true):SetPoint("TOPLEFT", 50, y - 8)
-    Gap(50)
-    if k.item then
-        Text("Which item?", "head")
-        local top = y
-        itemSlot:SetPoint("TOPLEFT", 0, top)
-        itemSlot:Show()
-        if form.item then
-            Text(form.itemName or "", "body", 52, 0, true):SetPoint("TOPLEFT", 52, top - 4)
-            Text("Click the slot to clear it.", "dim", 52, 0, true):SetPoint("TOPLEFT", 52, top - 22)
-        else
-            Text("Drag an item here from your bags, or shift-click it.", "body", 52, 0, true):SetPoint("TOPLEFT", 52, top - 4)
-            Text("Or type its name:", "dim", 52, 0, true):SetPoint("TOPLEFT", 52, top - 24)
-        end
-        y = top - 46
-        if not form.item then
-            textBox:SetPoint("TOPLEFT", 176, top - 18)
-            textBox:SetWidth(200)
-            textBox:Show()
-        end
-        Gap(6)
-    end
-    if k.text then
-        Text(k.text, "head")
-        textBox:SetWidth(k.kind == "todo" and CW - 20 or 260)
-        textBox:SetPoint("TOPLEFT", 6, y)
-        textBox:Show()
-        Gap(30)
-        if k.suggest == "creatures" then
-            local names = {}
-            if UnitExists("target") and not UnitIsPlayer("target") then
-                local ok, t = pcall(UnitName, "target")
-                if ok and type(t) == "string" then names[#names + 1] = t end
-            end
-            local seen = {}
-            for _, n in ipairs(names) do seen[n] = true end
-            local list = {}
-            for name, n in pairs(H.mobs) do if not seen[name] then list[#list + 1] = { name, n } end end
-            table.sort(list, function(a, b) return a[2] > b[2] end)
-            for i = 1, math.min(5, #list) do names[#names + 1] = list[i][1] end
-            if #names > 0 then
-                Text("Pick:", "dim", 6, 0, true)
-                local x, row = 48, 0
-                for _, name in ipairs(names) do
-                    local l = Link(name, 0, y - row * 18, function() textBox:SetText(name) end)
-                    if x + l:GetWidth() > CW then x, row = 48, row + 1 end
-                    l:ClearAllPoints()
-                    l:SetPoint("TOPLEFT", x, y - row * 18)
-                    x = x + l:GetWidth() + 12
-                end
-                Gap(20 + row * 18)
-            end
-        end
-        if k.suggest == "skills" then
-            local list = {}
-            for _, s in pairs(J.Skills()) do list[#list + 1] = s end
-            table.sort(list, function(a, b) return a.name < b.name end)
-            if #list > 0 then
-                Text("Yours:", "dim", 6, 0, true)
-                local x, row = 52, 0
-                for _, s in ipairs(list) do
-                    local l = Link(("%s (%d)"):format(s.name, s.level), 0, y - row * 18, function() textBox:SetText(s.name) end)
-                    if x + l:GetWidth() > CW then x, row = 52, row + 1 end
-                    l:ClearAllPoints()
-                    l:SetPoint("TOPLEFT", x, y - row * 18)
-                    x = x + l:GetWidth() + 12
-                end
-                Gap(20 + row * 18)
-            end
-        end
-        if k.suggest == "dungeons" then
-            local names = {}
-            for name in pairs(H.dungeons) do names[#names + 1] = name end
-            table.sort(names)
-            if #names > 0 then
-                Text("Visited:", "dim", 6, 0, true)
-                local x = 60
-                for _, name in ipairs(names) do
-                    local l = Link(name, 0, y, function() textBox:SetText(name) end)
-                    l:ClearAllPoints()
-                    l:SetPoint("TOPLEFT", x, y)
-                    x = x + l:GetWidth() + 10
-                end
-                Gap(20)
-            end
-        end
-    end
-    if k.count then
-        Text(k.count, "head")
-        countDown:SetPoint("TOPLEFT", 0, y + 1)
-        countDown:Show()
-        countBox:SetPoint("TOPLEFT", 30, y)
-        countBox:Show()
-        countUp:SetPoint("LEFT", countBox, "RIGHT", 2, 0)
-        countUp:Show()
-        Text(("Shift-click the arrows to step by %d."):format((goalKind.step or 1) * 10), "small", 124, 0, true):SetPoint("TOPLEFT", 124, y - 5)
-        Gap(30)
-    end
-    if formError then Gap(4); Text(formError, "bad") end
-end
-
-local function RenderGoals()
-    if goalView == "pick" then RenderGoalPick()
-    elseif goalView == "form" and goalKind then RenderGoalForm()
-    else RenderGoalList() end
 end
 
 -- Reminders -------------------------------------------------------------------------------
@@ -2722,9 +2373,9 @@ end
 -- Bláto Journal: who of the three of you has done a quest (Together.lua): the game's ready-check marks, a tick
 -- for done, a cross and red ink for not done, a question mark while nobody has said. mine: your own state, when
 -- the quest is not one of yours (a friend's quest you have not done).
-local MARK = { [true] = "|TInterface\\RaidFrame\\ReadyCheck-Ready:13|t", [false] = "|TInterface\\RaidFrame\\ReadyCheck-NotReady:13|t" }
-local MARK_UNKNOWN = "|TInterface\\RaidFrame\\ReadyCheck-Waiting:13|t"
-local function PartyMarks(questID, with, mine)
+BJ.MARK = { [true] = "|TInterface\\RaidFrame\\ReadyCheck-Ready:13|t", [false] = "|TInterface\\RaidFrame\\ReadyCheck-NotReady:13|t" }
+BJ.MARK_UNKNOWN = "|TInterface\\RaidFrame\\ReadyCheck-Waiting:13|t"
+function BJ.PartyMarks(questID, with, mine)
     local T, a, b = ns.Together, J.PartyMates()
     if not (T and a) then return nil end
     local parts = {}
@@ -2732,7 +2383,7 @@ local function PartyMarks(questID, with, mine)
         local st
         if i == 1 then st = mine == nil and true or mine else st = T.Status(name, questID, with) end
         local short = name:match("^(%S+)") or name
-        parts[#parts + 1] = (st == nil and MARK_UNKNOWN or MARK[st]) .. " " .. (st == false and ("|cffc0301a" .. short .. "|r") or short)
+        parts[#parts + 1] = (st == nil and BJ.MARK_UNKNOWN or BJ.MARK[st]) .. " " .. (st == false and ("|cffc0301a" .. short .. "|r") or short)
     end
     return table.concat(parts, "     ")
 end
@@ -2809,7 +2460,7 @@ local function RenderQuests()
     for id, p in pairs(H.partyQuests or {}) do
         if ns.Together and ns.Together.Done(id) ~= true and Find.Match(p.title or "") then
             behind[#behind + 1] = { t = p.t, text = p.title or ("Quest #%d"):format(id), icon = "Interface/GossipFrame/AvailableQuestIcon",
-                sub = PartyMarks(id, nil, false) }
+                sub = BJ.PartyMarks(id, nil, false) }
         end
     end
     table.sort(behind, function(a, b) return a.t > b.t end)
@@ -2855,7 +2506,7 @@ local function RenderQuests()
                 sub:SetWordWrap(false)
                 sub:SetPoint("TOPLEFT", 60, rowTop - 12 - title:GetStringHeight())
                 local marksH = 0
-                local marks = PartyMarks(q.questID, q.with)
+                local marks = BJ.PartyMarks(q.questID, q.with)
                 if marks then
                     local ml = Text(marks, "small", 60, 110, true)
                     ml:SetWordWrap(false)
@@ -3186,17 +2837,17 @@ function UI.OpenFellow() UI.Show("journey") end
 -- Bláto Journal: the party side (Party/, from One More Quest) as buttons, grouped like its feature list. The
 -- buttons come from ns.BlatoPage (Blato.lua); each section folds like the other headers of the journal.
 -- A plain button runs its /blato command, a switch flips and shows on or off; the tooltip names the command.
-local BLATO_COLS, BLATO_H, BLATO_GAP = 3, 30, 8
-local function BlatoHint(item)
+BJ.COLS, BJ.ROW_H, BJ.GAP = 3, 30, 8
+function BJ.Hint(item)
     if item.hint then return item.hint end
     if item.cmd then return "/blato " .. item.cmd .. (item.arg and (" " .. item.arg) or "") end
 end
-local function BlatoButton(x, top, w, item)
+function BJ.Button(x, top, w, item)
     local toggle = item.toggle
     local on = toggle and toggle.get() and true or false
     local edge = parchment and { 0.45, 0.30, 0.12, 0.45 } or { 0.30, 0.24, 0.15, 1 }
     local lit = parchment and { 1, 0.85, 0.45, 0.45 } or { 1, 0.80, 0.35, 0.12 }
-    Box(x, top, w, BLATO_H, on and lit or nil, edge)
+    Box(x, top, w, BJ.ROW_H, on and lit or nil, edge)
     Icon(item[2], x + 6, top - 5, 20)
     local label = Text(item[1], "body", x + 32, 0, true)
     label:SetPoint("TOPLEFT", x + 32, top - 8)
@@ -3210,7 +2861,7 @@ local function BlatoButton(x, top, w, item)
         if OMQ then OMQ:Fire("SETTINGS_CHANGED", "journal") end   -- the party's option windows redraw
         UI.Render()
     end
-    local spot = Hotspot(x, top, w, BLATO_H, press)
+    local spot = Hotspot(x, top, w, BJ.ROW_H, press)
     if toggle and UI.usedStyle == "classic" then
         -- the classic style shows a switch as the old game's check box
         Check(x + w - 28, top - 6, on, press):SetFrameLevel(spot:GetFrameLevel() + 1)
@@ -3224,7 +2875,7 @@ local function BlatoButton(x, top, w, item)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         GameTooltip:SetText(item[1], 1, 1, 1)
         GameTooltip:AddLine(item[3], nil, nil, nil, true)
-        local hint = BlatoHint(item)
+        local hint = BJ.Hint(item)
         if hint then GameTooltip:AddLine(hint, 0.6, 0.6, 0.6) end
         GameTooltip:Show()
     end)
@@ -3233,19 +2884,19 @@ local function BlatoButton(x, top, w, item)
         if item.hover == "stats" and ns.OMQ and ns.OMQ.Tooltip then ns.OMQ.Tooltip:Hide() end
     end)
 end
-local function RenderBlato()
+function BJ.RenderCommands()
     BarButtons({})
     PageHead("Commands", "The party of three in one place. Hover a button for what it does and its /blato command.")
     if not ns.OMQ then Text("The party side did not load.", "ink") return end
-    local w = math.floor((CW - BLATO_GAP * (BLATO_COLS - 1)) / BLATO_COLS)
+    local w = math.floor((CW - BJ.GAP * (BJ.COLS - 1)) / BJ.COLS)
     for _, sec in ipairs(ns.BlatoPage or {}) do
         if Header("blato:" .. sec.key, sec.title) then
             local top = y
             for i, item in ipairs(sec.items) do
-                local col, row = (i - 1) % BLATO_COLS, math.floor((i - 1) / BLATO_COLS)
-                BlatoButton(col * (w + BLATO_GAP), top - row * (BLATO_H + 6), w, item)
+                local col, row = (i - 1) % BJ.COLS, math.floor((i - 1) / BJ.COLS)
+                BJ.Button(col * (w + BJ.GAP), top - row * (BJ.ROW_H + 6), w, item)
             end
-            y = top - math.ceil(#sec.items / BLATO_COLS) * (BLATO_H + 6) - 6
+            y = top - math.ceil(#sec.items / BJ.COLS) * (BJ.ROW_H + 6) - 6
         end
     end
 end
@@ -3255,58 +2906,58 @@ end
 -- code is not ours to ship. While the tab is open its window sits exactly over the journal window, which takes its
 -- size, so the journal's tabs hang under it; dragging it drags the journal, closing it closes the journal. Any
 -- other tab, or closing the journal, puts it back where it was.
-local dock = { on = false }
-local function DungeonFrame()
+BJ.dock = { on = false }
+function BJ.DungeonFrame()
     local f = _G.ForeverDungeonJournalFrame
     return type(f) == "table" and f.SetPoint and f or nil
 end
-local function FitDock()
-    local f = DungeonFrame()
-    if not (dock.on and f) then return end
+function BJ.FitDock()
+    local f = BJ.DungeonFrame()
+    if not (BJ.dock.on and f) then return end
     local s = f:GetEffectiveScale() / win:GetEffectiveScale()
     win:SetSize(f:GetWidth() * s, f:GetHeight() * s)
 end
 function UI.Undock()
-    if not dock.on then return end
-    dock.on = false
-    local f = DungeonFrame()
+    if not BJ.dock.on then return end
+    BJ.dock.on = false
+    local f = BJ.DungeonFrame()
     if f then
-        dock.leaving = true
+        BJ.dock.leaving = true
         f:Hide()
-        dock.leaving = false
-        RestorePoints(f, dock.points)
-        f:SetScript("OnDragStart", dock.dragStart)
-        f:SetScript("OnDragStop", dock.dragStop)
+        BJ.dock.leaving = false
+        BJ.RestorePoints(f, BJ.dock.points)
+        f:SetScript("OnDragStart", BJ.dock.dragStart)
+        f:SetScript("OnDragStop", BJ.dock.dragStop)
     end
     win:SetSize(W, HGT)
     scroll:Show()
 end
-local function Dock()
-    local f = DungeonFrame()
+function BJ.Dock()
+    local f = BJ.DungeonFrame()
     if not f then return false end
-    if dock.on then FitDock(); f:Show(); return true end
-    dock.on = true
-    dock.points = SavePoints(f)
-    dock.dragStart, dock.dragStop = f:GetScript("OnDragStart"), f:GetScript("OnDragStop")
+    if BJ.dock.on then BJ.FitDock(); f:Show(); return true end
+    BJ.dock.on = true
+    BJ.dock.points = BJ.SavePoints(f)
+    BJ.dock.dragStart, BJ.dock.dragStop = f:GetScript("OnDragStart"), f:GetScript("OnDragStop")
     f:SetScript("OnDragStart", function() win:StartMoving() end)
     f:SetScript("OnDragStop", function() win:StopMovingOrSizing() end)
-    if not dock.hooked then
-        dock.hooked = true
-        hooksecurefunc(f, "SetScale", FitDock)   -- its resize grip scales it: the journal follows
-        f:HookScript("OnHide", function() if dock.on and not dock.leaving and win:IsShown() then win:Hide() end end)
+    if not BJ.dock.hooked then
+        BJ.dock.hooked = true
+        hooksecurefunc(f, "SetScale", BJ.FitDock)   -- its resize grip scales it: the journal follows
+        f:HookScript("OnHide", function() if BJ.dock.on and not BJ.dock.leaving and win:IsShown() then win:Hide() end end)
     end
     f:ClearAllPoints()
     f:SetPoint("TOPLEFT", win, "TOPLEFT", 0, 0)
-    FitDock()
+    BJ.FitDock()
     scroll:Hide()
     f:Show()
     return true
 end
 win:HookScript("OnHide", function() UI.Undock() end)
 
-local function RenderDungeons()
+function BJ.RenderDungeons()
     BarButtons({})
-    if Dock() then return end
+    if BJ.Dock() then return end
     PageHead("Dungeons", "Bosses, loot, quests and maps of every dungeon, from the addon Dungeon Journal.")
     Text("Dungeon Journal is not installed. Get \"Dungeon Journal\" by Exehn, the edition for WoW Forever, from CurseForge, "
         .. "unzip it into Interface/AddOns and /reload: this tab then shows it.", "body")
@@ -3325,12 +2976,12 @@ local function RenderDungeons()
 end
 
 -- Bláto Journal: no Goals and no Fellowship page (their code above stays unused)
-local RENDER = { commands = RenderBlato, dungeons = RenderDungeons, journey = RenderJourney, places = RenderPlaces,
+local RENDER = { commands = BJ.RenderCommands, dungeons = BJ.RenderDungeons, journey = RenderJourney, places = RenderPlaces,
     quests = RenderQuests, notes = RenderNotes }
 
 -- Rebuilding the page hides and re-shows its edit boxes, and hiding one drops keyboard focus.
 -- So the box being typed in gets its focus and cursor back afterwards.
-local PAGE_BOXES = { textBox, countBox, noteEdit, UI.journeySearch }
+local PAGE_BOXES = { noteEdit, UI.journeySearch }
 for _, b in ipairs(PAGE_BOXES) do b:HookScript("OnMouseDown", function(self) self:SetFocus() end) end
 local function FocusedBox() for _, b in ipairs(PAGE_BOXES) do if b:HasFocus() then return b end end end
 local pendingRender = false
@@ -3379,7 +3030,7 @@ function UI.Render()
 end
 
 function UI.Show(tab)
-    if tab and tab ~= current then goalView = "list"; if tab ~= "places" then openPlace = nil end end
+    if tab and tab ~= current and tab ~= "places" then openPlace = nil end
     current = tab or current
     SelectTab()
     win:Show()
@@ -3503,10 +3154,7 @@ function UI.Why()
                 end
                 local foci = GetMouseFoci and GetMouseFoci() or { GetMouseFocus and GetMouseFocus() }
                 print("Under the mouse: " .. Name(foci[1]))
-                print("Keyboard focus: " .. Name(GetCurrentKeyBoardFocus and GetCurrentKeyBoardFocus()))
-                print(("Count box: shown %s, focus %s, mouse %s, keyboard %s, level %d over page level %d"):format(
-                    tostring(countBox:IsVisible()), tostring(countBox:HasFocus()), tostring(countBox:IsMouseEnabled()),
-                    tostring(countBox:IsKeyboardEnabled()), countBox:GetFrameLevel(), content:GetFrameLevel()))
+                print("Keyboard focus: " .. Name(GetCurrentKeyBoardFocus and GetCurrentKeyBoardFocus()))
             end)
         end
     end)
