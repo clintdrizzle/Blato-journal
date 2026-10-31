@@ -49,7 +49,7 @@ ns.BlatoPage = {
         { "Follow flights", I .. "Ability_Mount_Gryphon_01", "A friend took a flight: your flight master picks the same destination.", toggle = Qol("flight") },
     } },
     { key = "onemore", title = "One more quest?", items = {
-        { "Start the vote", I .. "INV_Misc_Coin_17", "One more quest! or Bed time. If one more quest wins, the arrow leads the party to the next quest everybody has.", cmd = "vote" },
+        { "Start the vote", I .. "INV_Misc_Coin_17", "One more quest! or Bed time. If one more quest wins, the arrow leads the party to the next quest everybody has.", cmd = "sleep" },
         { "My title", I .. "INV_Misc_Head_Dragon_01", "Pick tonight's title from the offers after a Bed time vote.", cmd = "title", arg = "pick" },
     } },
     { key = "way", title = "Finding the way", items = {

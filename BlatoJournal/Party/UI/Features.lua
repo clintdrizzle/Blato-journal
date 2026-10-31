@@ -12,7 +12,7 @@ OMQ.Features = FE
 -- big things first. FE.LIST is the same content as one flat list.
 FE.SECTIONS = {
     { "Playing together", {
-        "One more quest: when the vote (/blato vote) says \"One more quest!\", the arrow leads the group to the next quest every friend has - its objectives, or the turn-in once all are done; no quest in common: a new one everybody can take",
+        "One more quest: when the vote (/blato sleep) says \"One more quest!\", the arrow leads the group to the next quest every friend has - its objectives, or the turn-in once all are done; no quest in common: a new one everybody can take",
         "Group statistics for the session, ranked between the friends: XP per hour, levels, gold, yards walked and yards on follow, damage share, killing blows, deaths, near deaths, fights started and more",
         "Lifetime statistics of every friend's character",
         "Quests are shared and accepted automatically between friends up to 5 levels apart",

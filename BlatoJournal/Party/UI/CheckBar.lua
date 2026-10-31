@@ -20,7 +20,7 @@ local MEDIA = "Interface\\AddOns\\BlatoJournal\\Party\\Media\\"
 local ITEMS = {
     { id = "ready", label = "Group Check", tip = "Click: durability, bags, drinks and class items of the group",
       icon = MEDIA .. "Icon_Check" },
-    { id = "vote", label = "Group vote (/blato vote)", tip = "Click: start a vote - One more quest! (the arrow then leads the group to the next quest) or Bed time",
+    { id = "vote", label = "Group vote (/blato sleep)", tip = "Click: start a vote - One more quest! (the arrow then leads the group to the next quest) or Bed time",
       icon = MEDIA .. "Icon_Vote" },
     { id = "bet", label = "Bet Check", tip = "Click: start a bet with the friends",          -- decision 170
       icon = MEDIA .. "Icon_Bet" },

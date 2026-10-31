@@ -5,7 +5,7 @@ A character journal and every party feature in one window, each feature a button
 
 ## What it does
 
-The **Bláto Journal** window (minimap button or `/blato`) has the look of the classic game (the old dialog frame and a parchment page; the options can switch it to a modern style) and these tabs:
+The **Bláto Journal** window (minimap button or `/blato`) looks like WoW Forever's own windows (the options also offer a parchment page and a classic look) and has these tabs:
 
 | Tab | What is on it |
 |---|---|
@@ -28,7 +28,7 @@ Most party features come alive when all three of you run the addon. Your party m
 ## Commands
 
 - `/blato` opens the Commands tab
-- `/blato vote` starts the "One more quest?" / "Bed time" vote
+- `/blato sleep` starts the "One more quest?" / "Bed time" vote
 - `/blato help` lists every party command
 - `/bj` or `/journal` opens the journal, `/note` writes a quick note
 
@@ -42,7 +42,7 @@ Bláto Journal joins two addons and changes them:
 Changes from the originals:
 
 - a new **Commands** tab with buttons for every party feature (`BlatoJournal/Blato.lua`, `BJ.RenderCommands` in `Journal/UI.lua`);
-- the classic look (`UI.Chrome` in `Journal/UI.lua`, its own parchment `Media/Parchment.tga`);
+- a classic look as an extra style (`UI.Chrome` in `Journal/UI.lua`, its own parchment `Media/Parchment.tga`);
 - a **Dungeons** tab that shows the separately installed Dungeon Journal inside the journal window;
 - a Journey about the party of three (`J.Together` in `Journal/Fellowship.lua`) and, on the Quests page, who has done each quest (`Together.lua`, messages JQD/JQH/JQA);
 - no Goals and no Fellowship tab (party mates are still recorded);

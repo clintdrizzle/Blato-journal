@@ -153,7 +153,7 @@ SlashCmdList["BLATOPARTY"] = function(input)
     input = (input or ""):match("^%s*(.-)%s*$")
     local cmd, rest = input:match("^(%S+)%s*(.*)$")
     if not cmd then
-        -- Bláto Journal: "/blato" alone opens the journal on the Commands page; the vote is "/blato vote"
+        -- Bláto Journal: "/blato" alone opens the journal on the Commands page; the vote is "/blato sleep"
         if ns.UI and ns.UI.Show then ns.UI.Show("commands") else OMQ:Fire("SLASH_EMPTY") end
         return
     end
@@ -188,7 +188,7 @@ OMQ:RegisterCommand("debug", function()
     for _, e in ipairs(OMQ.errors or {}) do print("   " .. e) end
 end, "show internal state")
 
-OMQ:RegisterCommand("vote", function() OMQ:Fire("SLASH_EMPTY") end, "One more quest? or Bed time: start the group vote")
+OMQ:RegisterCommand("sleep", function() OMQ:Fire("SLASH_EMPTY") end, "One more quest? or Bed time: start the group vote")
 
 ----------------------------------------------------------------------
 -- Lifecycle

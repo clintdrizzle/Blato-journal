@@ -291,12 +291,13 @@ local inset = Child(win, "Inset") or win
 -- Page art --------------------------------------------------------------------------------------
 -- Modern styles use the art of the new windows on this client (group finder, professions, spellbook); see
 -- .harness/forever-art.txt for where each atlas comes from. Modern dark is the default ("auto" tries them in order).
+-- Bláto Journal: the look of WoW Forever's own windows is the default (Forever runs on the modern client).
+-- Classic is an extra: a parchment page (Media/Parchment ships with the addon) in the old game's dialog frame
+-- (UI.Chrome below).
 local STYLES = {
-    -- Bláto Journal: the classic look, the default. A parchment page (Media/Parchment ships with the addon, so it is
-    -- always there) inside the old game's dialog frame (UI.Chrome below).
+    { key = "moderndark", label = "Forever", atlases = { "groupfinder-background" }, dark = true },
+    { key = "modernparchment", label = "Forever parchment", atlases = { "spellbook-Page-Left-C60" } },
     { key = "classic", label = "Classic", files = { "Interface\\AddOns\\BlatoJournal\\Media\\Parchment" } },
-    { key = "moderndark", label = "Modern dark", atlases = { "groupfinder-background" }, dark = true },
-    { key = "modernparchment", label = "Modern parchment", atlases = { "spellbook-Page-Left-C60" } },
 }
 UI.STYLES = STYLES
 local function TryStyle(tex, s)
@@ -2866,9 +2867,18 @@ function BJ.Button(x, top, w, item)
         -- the classic style shows a switch as the old game's check box
         Check(x + w - 28, top - 6, on, press):SetFrameLevel(spot:GetFrameLevel() + 1)
     elseif toggle then
-        local state = Text(on and "|cff60c060on|r" or "|cff8a8a8aoff|r", "small", x + w - 30, 0, true)
-        state:SetPoint("TOPLEFT", x + w - 30, top - 9)
-        state:SetWidth(26)
+        -- the Forever styles: the check box of the game's own options (Kit.Page:Check uses the same template)
+        local c = Next("fcheck", function()
+            local cb = Kit.Make("CheckButton", content, "SettingsCheckboxTemplate", "UICheckButtonTemplate")
+            cb:SetScript("OnEnter", nil)   -- the template's handlers expect a Blizzard setting behind it
+            cb:SetScript("OnLeave", nil)
+            return cb
+        end)
+        c:SetSize(26, 26)
+        c:SetPoint("TOPLEFT", x + w - 30, top - 2)
+        c:SetChecked(on)
+        c:SetScript("OnClick", press)
+        c:SetFrameLevel(spot:GetFrameLevel() + 1)
     end
     spot:SetScript("OnEnter", function(self)
         if item.hover == "stats" and ns.OMQ and ns.OMQ.Tooltip then ns.OMQ.Tooltip:Show(self) return end
@@ -3154,7 +3164,7 @@ function UI.Why()
                 end
                 local foci = GetMouseFoci and GetMouseFoci() or { GetMouseFocus and GetMouseFocus() }
                 print("Under the mouse: " .. Name(foci[1]))
-                print("Keyboard focus: " .. Name(GetCurrentKeyBoardFocus and GetCurrentKeyBoardFocus()))
+                print("Keyboard focus: " .. Name(GetCurrentKeyBoardFocus and GetCurrentKeyBoardFocus()))
             end)
         end
     end)

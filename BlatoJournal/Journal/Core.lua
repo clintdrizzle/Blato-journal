@@ -18,9 +18,9 @@ function J.Defaults()
     D("momentSeconds", 5); D("toastX", 0); D("toastTop", -70); D("toastScale", 1.2)
     D("tracker", true); D("trackerMax", 5); D("trackerX", -40); D("trackerY", -40)
     D("trackerReminders", true); D("trackerReminderMax", 5)
-    D("style", "classic"); D("minimap", true); D("minimapAngle", 200)
-    -- Bláto Journal: three page styles, classic the default; anything else becomes classic
-    if DB.style ~= "classic" and DB.style ~= "moderndark" and DB.style ~= "modernparchment" then DB.style = "classic" end
+    D("style", "moderndark"); D("minimap", true); D("minimapAngle", 200)
+    -- Bláto Journal: three page styles, the Forever look (modern dark) the default; anything else becomes it
+    if DB.style ~= "classic" and DB.style ~= "moderndark" and DB.style ~= "modernparchment" then DB.style = "moderndark" end
     D("sounds", true); D("soundMaster", false)
     DB.sound = DB.sound or {}
     D("reminderSeconds", 8)

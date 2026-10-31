@@ -561,5 +561,5 @@ end)
 OMQ:RegisterCommand("next", function(arg)
     arg = (arg or ""):lower()
     if arg == "diag" then NQ.Diag(); return end
-    OMQ:Print("one more quest: start the vote with /blato vote - when \"One more quest!\" wins, the arrow leads to the next quest")
+    OMQ:Print("one more quest: start the vote with /blato sleep - when \"One more quest!\" wins, the arrow leads to the next quest")
 end, "one more quest: /blato next diag tells what the quest search sees")
