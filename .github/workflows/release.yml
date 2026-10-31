@@ -14,14 +14,23 @@ on:
 permissions:
   contents: write
 
+# A newer push replaces a run that is still going (for example one stuck at the package download).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install Lua 5.1
-        run: sudo apt-get update -q && sudo apt-get install -y -q lua5.1
+        timeout-minutes: 6
+        run: |
+          sudo apt-get update -q -o Acquire::Retries=3 -o Acquire::http::Timeout=30
+          sudo apt-get install -y -q -o Acquire::Retries=3 lua5.1
 
       - name: Lua syntax of every file
         run: |
@@ -55,7 +64,7 @@ jobs:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Read version
         id: v
