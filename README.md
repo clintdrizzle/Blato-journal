@@ -18,6 +18,8 @@ The **Bláto Journal** window (minimap button or `/blato`) looks like WoW Foreve
 
 Most party features come alive when all three of you run the addon. Your party mates are the two players you have spent the most time grouped with.
 
+<p align="center"><img src=".github/features.jpg" alt="Bláto Journal features: autofollow with one key, bets, quest sync and auto share, lifetime stats, reminders, finders, dungeon loot tables and maps, a tracker of your journey together, a shared notepad, missing dungeon quests, designs and sounds, arrows to your buddy, and much more" width="100%"></p>
+
 ## Install
 
 1. Download the latest `BlatoJournal_vX.Y.Z.zip` from [Releases](../../releases).
