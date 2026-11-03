@@ -2066,9 +2066,16 @@ composer.pin:SetPoint("RIGHT", composer.pinText, "LEFT", -2, 0)
 composer.save = Kit.Make("Button", composer, "UIPanelButtonTemplate")
 composer.save:SetSize(110, 22)
 composer.save:SetPoint("BOTTOMRIGHT", -12, 12)
+-- Bláto Journal: the note goes to the party's shared notepad too (Together.lua)
+composer.shareText = composer:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+composer.shareText:SetText("Share with the party")
+composer.shareText:SetPoint("RIGHT", composer.save, "LEFT", -12, 0)
+composer.share = Kit.Make("CheckButton", composer, "UICheckButtonTemplate")
+composer.share:SetSize(22, 22)
+composer.share:SetPoint("RIGHT", composer.shareText, "LEFT", -2, 0)
 composer.hint = composer:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 composer.hint:SetPoint("BOTTOMLEFT", 14, 17)
-composer.hint:SetText("Enter saves, Shift+Enter starts a new line.")
+composer.hint:SetText("Enter saves, Shift+Enter: new line.")
 composer:SetScript("OnClick", function() noteEdit:SetFocus() end)
 table.insert(UI.linkBoxes, noteEdit)
 local noteRow = Persist(ReminderRow(content))
@@ -2085,13 +2092,14 @@ local function SaveComposer()
         if J.TriggerKey(trigger) ~= J.TriggerKey(n.trigger) or (repeats and true or nil) ~= n.repeats then
             J.SetReminder(n, trigger, repeats)
         end
-    elseif text:match("%S") and J.AddNote(text, trigger, repeats, pinned) then
+    elseif text:match("%S") and J.AddNote(text, trigger, repeats, pinned, composer.share:GetChecked() and true or false) then
         UI.PlaySound(DB.sound.note)
     end
     noteEdit:SetText("")
     noteEdit:ClearFocus()
     noteRow:Reset(nil)
     composer.pin:SetChecked(DB.autoPin)
+    composer.share:SetChecked(DB.shareNotes ~= false)
     UI.Render()
 end
 composer.save:SetScript("OnClick", SaveComposer)
@@ -2161,11 +2169,16 @@ local function RenderNotes()
     placeholder:SetText("Write about this place, a reminder for later, or shift-click an item into it...")
     placeholder:SetShown(noteEdit:GetText() == "")
     composer:Show()
-    for _, fs in ipairs({ composer.pinText, composer.hint }) do fs:SetTextColor(dim[1], dim[2], dim[3]); Shadow(fs) end
+    for _, fs in ipairs({ composer.pinText, composer.hint, composer.shareText }) do fs:SetTextColor(dim[1], dim[2], dim[3]); Shadow(fs) end
     composer.save:SetText(editingNote and "Save changes" or "Save note")
     composer.pin:SetShown(not editingNote)
     composer.pinText:SetShown(not editingNote)
-    if not editingNote and noteEdit:GetText() == "" then composer.pin:SetChecked(DB.autoPin) end
+    composer.share:SetShown(not editingNote)
+    composer.shareText:SetShown(not editingNote)
+    if not editingNote and noteEdit:GetText() == "" then
+        composer.pin:SetChecked(DB.autoPin)
+        composer.share:SetChecked(DB.shareNotes ~= false)
+    end
     -- the reminder picker sits on the sheet, under the writing lines
     noteRow:SetParent(composer)
     noteRow:Ink()
@@ -2183,6 +2196,31 @@ local function RenderNotes()
 
     Find.Field("notes", 0, y, CW, "Search notes")
     Gap(40)
+
+    -- Bláto Journal: the party's shared notepad (Together.lua), your shared notes and your friends', newest first
+    local T = ns.Together
+    if T then
+        T.AskNotes()
+        local shared = {}
+        for _, s in ipairs(T.SharedNotes()) do
+            if Find.Match(s.note.text, s.note.zone, s.note.subzone, s.note.author) then shared[#shared + 1] = s end
+        end
+        if Header("notes:shared", "Shared notepad", tostring(#shared)) then
+            if #shared == 0 then Text("Nothing shared yet. Tick \"Share with the party\" and your friends can read it too.", "ink") end
+            for i = 1, math.min(#shared, 30) do
+                local s, n, top = shared[i], shared[i].note, y
+                local who = s.mine and "You" or ((n.author or "?"):match("^(%S+)") or n.author)
+                Text(who, "ink", 0, 0, true):SetTextColor(unpack(Ink("head")))
+                Text(date("%b %d", s.t), "small", 0, 0, true):SetPoint("TOPLEFT", 0, top - 17)
+                Text(n.text, "body", TIME_COL + 10, 100)
+                Text(("%s  ·  level %d"):format(s.mine and J.NoteWhere(n) or (n.zone or "Somewhere"), n.level or 0), "small", TIME_COL + 10, 100)
+                Entry(top, { s.mine and Link("Unshare", 0, top, function() T.SetShared(n.id, false) end)
+                    or Link("Hide", 0, top, function() T.HidePartyNote(n.key) end) })
+                Gap(12)
+            end
+        end
+    end
+
     local pending, others = {}, {}
     for i = #H.notes, 1, -1 do
         local n = H.notes[i]
@@ -2221,13 +2259,17 @@ local function RenderNotes()
             tm:SetTextColor(unpack(Ink("head")))
             Text("pinned", "ink", 0, 0, true):SetPoint("TOPLEFT", 0, top - 17)
         end
-        -- keep the text clear of the hover links on the right (Unpin, Edit, Archive)
-        Text(n.text, "body", TIME_COL, 140)
-        Text(("%s  ·  level %d"):format(J.NoteWhere(n), n.level or 0), "small", TIME_COL, 140)
+        if n.shared then Text("shared", "ink", 0, 0, true):SetPoint("TOPLEFT", 0, top - (n.pinned and 31 or 17)) end
+        -- keep the text clear of the hover links on the right (Share, Unpin, Edit, Archive)
+        Text(n.text, "body", TIME_COL, 190)
+        Text(("%s  ·  level %d"):format(J.NoteWhere(n), n.level or 0), "small", TIME_COL, 190)
         local links = {}
         links[#links + 1] = Link("Archive", 0, top, function() J.SetArchived("note", n.id, true) end)
         links[#links + 1] = Link("Edit", 52, top, function() StartEdit(n) end)
         links[#links + 1] = Link(n.pinned and "Unpin" or "Pin", 88, top, function() J.TogglePin(n.id) end)
+        if ns.Together then
+            links[#links + 1] = Link(n.shared and "Unshare" or "Share", 130, top, function() ns.Together.SetShared(n.id, not n.shared) end)
+        end
         if n.trigger and n.done then
             local rowTop = y
             Text(("Reminded you %s  ·  %s"):format(n.firedAt and date("%b %d, %H:%M", n.firedAt) or "", J.TriggerLabel(n.trigger)),
@@ -3103,6 +3145,14 @@ slipPin.label:SetPoint("RIGHT", slip, "BOTTOMRIGHT", -26, 36)
 slipPin.label:SetText("Pin to Journey")
 slipPin:SetPoint("RIGHT", slipPin.label, "LEFT", -2, 0)
 slipPin:SetScript("OnClick", function() slipEdit:SetFocus() end)
+-- Bláto Journal: share the note with the party (Together.lua); starts from the "Share new notes" option
+dlg.shareText = dlg:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+dlg.shareText:SetText("Share with the party")
+dlg.shareText:SetPoint("RIGHT", slipPin, "LEFT", -12, 0)
+dlg.share = Kit.Make("CheckButton", dlg, "UICheckButtonTemplate")
+dlg.share:SetSize(22, 22)
+dlg.share:SetPoint("RIGHT", dlg.shareText, "LEFT", -2, 0)
+dlg.share:SetScript("OnClick", function() slipEdit:SetFocus() end)
 
 function UI.StyleDialog()
     local used = Paper(PaintPage(slip))
@@ -3111,6 +3161,7 @@ function UI.StyleDialog()
     Style(where, "dim")
     Style(slipHint, "small")
     Style(slipPin.label, "small")
+    Style(dlg.shareText, "small")
     slipRow:Ink()
     local c = Ink("body")
     slipEdit:SetTextColor(c[1], c[2], c[3])
@@ -3120,7 +3171,7 @@ end
 
 local function SaveSlip()
     local trigger = slipRow.trigger
-    if J.AddNote(slipEdit:GetText(), trigger, slipRow.every:GetChecked(), slipPin:GetChecked()) then
+    if J.AddNote(slipEdit:GetText(), trigger, slipRow.every:GetChecked(), slipPin:GetChecked(), dlg.share:GetChecked() and true or false) then
         J.Moment(trigger and ("|cffb0b0b0Noted. Reminder set: %s.|r"):format(J.TriggerLabel(trigger):gsub("^%u", string.lower)) or "|cffb0b0b0Noted in your journal.|r", "note")
     end
     slipEdit:SetText("")
@@ -3136,6 +3187,7 @@ function UI.NoteDialog()
     where:SetText(("%s  ·  level %d"):format(J.NoteWhere(stamp), J.Level()))
     slipHint:SetText("Enter saves, Shift+Enter new line, Esc closes.")
     slipPin:SetChecked(DB.autoPin)
+    dlg.share:SetChecked(DB.shareNotes ~= false)
     slipEdit:SetText("")
     slipRow:Reset(nil)
     dlg:Show()

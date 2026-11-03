@@ -26,6 +26,7 @@ function J.Defaults()
     D("reminderSeconds", 8)
     D("questGroup", "day")
     D("autoPin", false)
+    D("shareNotes", true)   -- Bláto Journal: new notes go to the shared notepad of the party (Together.lua)
     D("detail", "story"); D("fleetingMinutes", 10); D("questRewards", true); D("foldChapters", true)
     D("archiveReminders", true)   -- finished one-time reminders go to the archive
     D("archiveGoals", false)      -- reached goals go to the archive

@@ -26,6 +26,9 @@ for _, s in ipairs(UI.STYLES) do styles[#styles + 1] = { s.key, s.label } end
 page:Dropdown("Page style", styles, Get("style"), Set("style"))
 page:Check("Pin new notes to the Journey", Get("autoPin"), Set("autoPin"),
     "New notes also show on the Journey page, under the level you wrote them. The quick note slip has its own tick box for each note.")
+page:Check("Share new notes with the party", function() return DB.shareNotes ~= false end, Set("shareNotes"),
+    "New notes go to the shared notepad: your friends in the group with Bláto Journal see them on their Notes page. "
+    .. "Each note has its own tick box, and Share / Unshare on the Notes page.")
 page:Text(function()
     local used = UI.usedStyle or "dark"
     for _, s in ipairs(UI.STYLES) do if s.key == used then return "In use: " .. s.label .. "." end end

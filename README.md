@@ -14,7 +14,7 @@ The **Bláto Journal** window (minimap button or `/blato`) looks like WoW Foreve
 | **Journey** | What the three of you have done together: time, shared quests, dungeons (runs, clears, bosses) and the firsts you shared. Below that, your own character's path, level by level. |
 | Places | The zones and dungeons you have visited. |
 | **Quests** | The quests you handed in, and for each one who of the three of you has done it (✓), has not (✗) or is not known yet (?). On top: quests your friends have done and you have not. |
-| Notes | Notes with reminders ("I owe my buddy 12 gold"). |
+| **Notes** | Notes with reminders ("I owe my buddy 12 gold"), and a notepad shared with your party: tick "Share with the party" and your friends read the note too. |
 
 Most party features come alive when all three of you run the addon. Your party mates are the two players you have spent the most time grouped with.
 
@@ -49,6 +49,7 @@ Changes from the originals:
 - a Journey about the party of three (`J.Together` in `Journal/Fellowship.lua`) and, on the Quests page, who has done each quest (`Together.lua`, messages JQD/JQH/JQA);
 - no Goals and no Fellowship tab (party mates are still recorded);
 - "Time AFK" in tonight's statistics;
+- a shared notepad: notes marked shared go to the party (`Together.lua`, messages JN/JNX/JNQ);
 - left out from One More Quest: automatic quest accepting and turn-in, Shift-click heals, the Dad UI, the chat filter and the guided tour;
 - renamed globals, saved variables and commands (`/blato`, `/bj`), so Bláto Journal can be installed next to the originals;
 - the simulator (`/blato sim`) starts with 2 party mates and never sends real mail.
