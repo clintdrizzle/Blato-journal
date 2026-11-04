@@ -392,10 +392,10 @@ end
 -- Four stamps in the colours of the item qualities (decision 160). Every dad sees the same one: it is
 -- picked from the quest ID, scrambled so that quests in a row get different stamps.
 T.STAMPS = {
-    { key = "uncommon",  file = "Interface\\AddOns\\BlatoJournal\\Party\\Media\\Stamp_Uncommon",  color = { 0.12, 1.00, 0.00 } },
-    { key = "rare",      file = "Interface\\AddOns\\BlatoJournal\\Party\\Media\\Stamp_Rare",      color = { 0.19, 0.55, 1.00 } },
-    { key = "epic",      file = "Interface\\AddOns\\BlatoJournal\\Party\\Media\\Stamp_Epic",      color = { 0.64, 0.21, 0.93 } },
-    { key = "legendary", file = "Interface\\AddOns\\BlatoJournal\\Party\\Media\\Stamp_Legendary", color = { 1.00, 0.50, 0.00 } },
+    { key = "uncommon",  file = "Interface\\AddOns\\BlatoLexicon\\Party\\Media\\Stamp_Uncommon",  color = { 0.12, 1.00, 0.00 } },
+    { key = "rare",      file = "Interface\\AddOns\\BlatoLexicon\\Party\\Media\\Stamp_Rare",      color = { 0.19, 0.55, 1.00 } },
+    { key = "epic",      file = "Interface\\AddOns\\BlatoLexicon\\Party\\Media\\Stamp_Epic",      color = { 0.64, 0.21, 0.93 } },
+    { key = "legendary", file = "Interface\\AddOns\\BlatoLexicon\\Party\\Media\\Stamp_Legendary", color = { 1.00, 0.50, 0.00 } },
 }
 function T.StampFor(qid)
     local h = (tonumber(qid) or 0) * 2654435761 % 4294967296      -- Knuth's multiplicative hash

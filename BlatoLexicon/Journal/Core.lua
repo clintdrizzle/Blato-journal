@@ -1,4 +1,4 @@
--- BlatoJournal core: a per-character record of the journey (time per level and zone, kills, quests, deaths,
+-- BlatoLexicon core: a per-character record of the journey (time per level and zone, kills, quests, deaths,
 -- dungeons, firsts), plus goals and notes. UI.lua draws it, Settings.lua holds the options page.
 -- The combat log is closed to addons on this client, so kills are counted from XP gains in or just after combat.
 local _, ns = ...
@@ -19,14 +19,14 @@ function J.Defaults()
     D("tracker", true); D("trackerMax", 5); D("trackerX", -40); D("trackerY", -40)
     D("trackerReminders", true); D("trackerReminderMax", 5)
     D("style", "moderndark"); D("minimap", true); D("minimapAngle", 200)
-    -- Bláto Journal: three page styles, the Forever look (modern dark) the default; anything else becomes it
+    -- Blato Lexicon: three page styles, the Forever look (modern dark) the default; anything else becomes it
     if DB.style ~= "classic" and DB.style ~= "moderndark" and DB.style ~= "modernparchment" then DB.style = "moderndark" end
     D("sounds", true); D("soundMaster", false)
     DB.sound = DB.sound or {}
     D("reminderSeconds", 8)
     D("questGroup", "day")
     D("autoPin", false)
-    D("shareNotes", true)   -- Bláto Journal: new notes go to the shared notepad of the party (Together.lua)
+    D("shareNotes", true)   -- Blato Lexicon: new notes go to the shared notepad of the party (Together.lua)
     D("detail", "story"); D("fleetingMinutes", 10); D("questRewards", true); D("foldChapters", true)
     D("archiveReminders", true)   -- finished one-time reminders go to the archive
     D("archiveGoals", false)      -- reached goals go to the archive
@@ -550,7 +550,7 @@ J.CheckStatKills = CheckStatKills   -- for the test harness
 function J.StartKillStat()
     killStat = FindKillStat()
     lastStatKills = killStat and StatValue(killStat) or nil
-    if DB.debug then print("BlatoJournal: kills counted from " .. (killStat and ("the statistic #" .. killStat) or "XP gains")) end
+    if DB.debug then print("BlatoLexicon: kills counted from " .. (killStat and ("the statistic #" .. killStat) or "XP gains")) end
 end
 
 local function OnXP()
@@ -586,7 +586,7 @@ local function EnterZone()
     if not InDungeon() and not H.zones[zone] then
         local first = next(H.zones) == nil
         H.zones[zone] = { time = 0, kills = 0, quests = 0, deaths = 0, first = time(), firstLevel = J.Level() }
-        local text = first and ("The journal begins in %s"):format(zone) or ("New chapter: %s"):format(zone)
+        local text = first and ("The lexicon begins in %s"):format(zone) or ("New chapter: %s"):format(zone)
         J.Log("zone", text)
         if DB.momentZone then J.Moment(("|cffffd100%s|r"):format(text), "zone") end
     end
@@ -696,7 +696,7 @@ end
 local loggedIn = false
 ev:SetScript("OnEvent", function(_, event, a1, a2, a3)
     if event == "ADDON_LOADED" then
-        if a1 == "BlatoJournal" then AdoptSaved() end
+        if a1 == "BlatoLexicon" then AdoptSaved() end
     elseif event == "PLAYER_LOGIN" then
         AdoptSaved()
         lastXP, lastMax, lastLevel = UnitXP("player"), UnitXPMax("player"), UnitLevel("player")
@@ -782,6 +782,6 @@ C_Timer.NewTicker(1, J.Tick)
 -- Let ForeverImmersion fade the goal tracker like any other element (plain data; see ForeverImmersion).
 ForeverUI = ForeverUI or {}
 ForeverUI.elements = ForeverUI.elements or {}
-table.insert(ForeverUI.elements, { key = "forever:journalgoals", label = "Journal tracker", frames = { "BlatoJournalTracker" },
+table.insert(ForeverUI.elements, { key = "forever:journalgoals", label = "Lexicon tracker", frames = { "BlatoLexiconTracker" },
     visible = { idle = true, resting = true, mounted = true, key = true } })
 ForeverUI.revision = (ForeverUI.revision or 0) + 1

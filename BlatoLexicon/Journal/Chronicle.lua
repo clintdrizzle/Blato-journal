@@ -1,4 +1,4 @@
--- BlatoJournal chronicle: the smaller moments of a journey, caught as they happen and written into the
+-- BlatoLexicon chronicle: the smaller moments of a journey, caught as they happen and written into the
 -- Journey page. Spells and recipes, professions and skill caps, reputation, epic finds, bosses, mounts and pets,
 -- talent re-specs, and where each quest came from. The big ones (first boss kills, epic finds, Honored and up)
 -- are marked keep = true and show as keepsakes.
@@ -431,7 +431,7 @@ end
 local LEARN = { Pattern(ERR_LEARN_SPELL_S), Pattern(ERR_LEARN_ABILITY_S) }
 local RECIPE = Pattern(ERR_LEARN_RECIPE_S)
 f:SetScript("OnEvent", function(_, event, a1, a2, a3, a4, a5)
-    -- /bj events (debug mode): print what the client sends, to see which of these it supports
+    -- /bl events (debug mode): print what the client sends, to see which of these it supports
     if DB.debug and DB.logEvents and (event ~= "CHAT_MSG_SYSTEM" or Plain(a1)) and event ~= "QUEST_LOG_UPDATE" and event ~= "UNIT_QUEST_LOG_CHANGED" then
         print(("|cff8888ffFJ event|r %s %s %s"):format(event, tostring(Plain(a1) or a1), tostring(Plain(a2) or a2)))
     end
@@ -481,9 +481,9 @@ f:SetScript("OnEvent", function(_, event, a1, a2, a3, a4, a5)
         local okm, model = pcall(ModelAtEnd)
         lastModel = okm and model or nil
         if DB.debug then
-            print(("BlatoJournal boss model: %s (start %s)"):format(tostring(lastModel), tostring(fightModel)))
+            print(("BlatoLexicon boss model: %s (start %s)"):format(tostring(lastModel), tostring(fightModel)))
             local w = seenBosses[Plain(a2) or ""]
-            print(("BlatoJournal boss: %s, start seen: %s, type %s, family %s, icon %s"):format(tostring(Plain(a2)), tostring(encounterName),
+            print(("BlatoLexicon boss: %s, start seen: %s, type %s, family %s, icon %s"):format(tostring(Plain(a2)), tostring(encounterName),
                 tostring(w and w.type), tostring(w and w.family), tostring(w and w.icon)))
         end
         Boss(a2, a5, a1)

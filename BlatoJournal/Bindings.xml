@@ -1,8 +1,0 @@
-<Bindings>
-    <Binding name="BLATOJOURNAL_TOGGLE" header="BLATOJOURNAL" category="ADDONS">
-        BlatoJournal_Toggle()
-    </Binding>
-    <Binding name="BLATOJOURNAL_NOTE" category="ADDONS">
-        BlatoJournal_Note()
-    </Binding>
-</Bindings>

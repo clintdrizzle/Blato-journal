@@ -1,4 +1,4 @@
--- Bláto Journal: who of the three of you has done a quest, for the Quests page. Each game only knows its own
+-- Blato Lexicon: who of the three of you has done a quest, for the Quests page. Each game only knows its own
 -- quests (IsQuestFlaggedCompleted), so the journals tell each other over the party's addon channel (Party/Comm.lua):
 --   JQD|proto|name|questID|title       I handed this quest in just now
 --   JQH|proto|reqId|name|id,id,...     have you done these? (up to ASK_CHUNK ids)

@@ -252,8 +252,8 @@ end
 function A:ApplyStyle()
     if not texture then return end
     local st = self:Style()
-    texture:SetTexture("Interface\\AddOns\\BlatoJournal\\Party\\Media\\Arrow" .. st .. "_Tint")
-    detail:SetTexture("Interface\\AddOns\\BlatoJournal\\Party\\Media\\Arrow" .. st .. "_Detail")
+    texture:SetTexture("Interface\\AddOns\\BlatoLexicon\\Party\\Media\\Arrow" .. st .. "_Tint")
+    detail:SetTexture("Interface\\AddOns\\BlatoLexicon\\Party\\Media\\Arrow" .. st .. "_Detail")
 end
 function A:SetStyle(st)
     OMQ.db.arrow.style = st
@@ -263,8 +263,8 @@ end
 function A:StyleChoices()
     local out = {}
     for i, name in ipairs(A.STYLES) do
-        out[i] = { label = name, tint = "Interface\\AddOns\\BlatoJournal\\Party\\Media\\Arrow" .. i .. "_Tint",
-                   detail = "Interface\\AddOns\\BlatoJournal\\Party\\Media\\Arrow" .. i .. "_Detail" }
+        out[i] = { label = name, tint = "Interface\\AddOns\\BlatoLexicon\\Party\\Media\\Arrow" .. i .. "_Tint",
+                   detail = "Interface\\AddOns\\BlatoLexicon\\Party\\Media\\Arrow" .. i .. "_Detail" }
     end
     return out
 end

@@ -140,7 +140,7 @@ local function payStep()
         if e.state ~= "paid" and not skipped[e] then
             if not e.toFull or e.toFull == "" then e.toFull = OMQ.Bets.FullNameOf(e.to) end
             if OMQ.Sim and OMQ.Sim:IsSim(e.to) then
-                -- Bláto Journal: a fake dad of the simulator never gets real mail
+                -- Blato Lexicon: a fake dad of the simulator never gets real mail
                 skipped[e] = true
             elseif not e.toFull then
                 skipped[e] = true

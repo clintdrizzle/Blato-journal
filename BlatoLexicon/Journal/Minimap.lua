@@ -1,11 +1,11 @@
--- BlatoJournal minimap button: the standard round button on the minimap's edge.
+-- BlatoLexicon minimap button: the standard round button on the minimap's edge.
 -- Left-click opens the journal, right-click writes a quick note, drag moves it around the minimap.
 -- It is a child of the minimap, so ForeverImmersion fades it together with the minimap.
 local _, ns = ...
 local J, UI = ns.J, ns.UI
 local DB = J.DB
 
-local button = CreateFrame("Button", "BlatoJournalMinimapButton", Minimap)
+local button = CreateFrame("Button", "BlatoLexiconMinimapButton", Minimap)
 button:SetSize(31, 31)
 button:SetFrameStrata("MEDIUM")
 button:SetFrameLevel(8)
@@ -53,8 +53,8 @@ button:SetScript("OnClick", function(_, which)
 end)
 button:SetScript("OnEnter", function(self)
     GameTooltip:SetOwner(self, "ANCHOR_LEFT")
-    GameTooltip:SetText("Bláto Journal", 1, 1, 1)
-    GameTooltip:AddLine("Left-click to open your journal.", 0.9, 0.82, 0.6)
+    GameTooltip:SetText("Blato Lexicon", 1, 1, 1)
+    GameTooltip:AddLine("Left-click to open your lexicon.", 0.9, 0.82, 0.6)
     GameTooltip:AddLine("Right-click to write a quick note.", 0.9, 0.82, 0.6)
     GameTooltip:AddLine("Drag to move around the minimap.", 0.6, 0.6, 0.6)
     GameTooltip:Show()

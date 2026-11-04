@@ -3,7 +3,7 @@
 -- tracker alone. While the simulator runs, every addon message goes to the fake dads instead of
 -- the party (Comm.lua), so real players never see simulated data. The fake dads answer like real
 -- clients: they join or skip bets, report values, pay or get paid, and make quest progress.
--- Bláto Journal: their full names are made up and Bet/Mail.lua never mails a fake dad (the original sent
+-- Blato Lexicon: their full names are made up and Bet/Mail.lua never mails a fake dad (the original sent
 -- real mail to the author's alts). The default is 2 fake dads: you and two friends, the Bláto party of three.
 --   /blato sim [1-3]                   start with 1 to 3 fake dads (default 2); again: status
 --   /blato sim off                     stop; fake dads, their bets and their ledger entries are removed

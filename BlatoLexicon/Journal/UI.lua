@@ -1,4 +1,4 @@
--- BlatoJournal UI: moments, the on-screen goal tracker, the journal window (Journey, Places, Goals, Notes)
+-- BlatoLexicon UI: moments, the on-screen goal tracker, the journal window (Journey, Places, Goals, Notes)
 -- and the quick-note box. Built from Blizzard templates so it reads like a native window.
 local _, ns = ...
 local J, Kit = ns.J, ns.Kit
@@ -29,7 +29,7 @@ local function Draggable(frame, xKey, yKey, anchor, canMove)
 end
 
 -- Moments -----------------------------------------------------------------------------------
-local toast = CreateFrame("Frame", "BlatoJournalToast", UIParent)
+local toast = CreateFrame("Frame", "BlatoLexiconToast", UIParent)
 toast:SetSize(460, 24)
 toast:SetFrameStrata("HIGH")
 toast:Hide()
@@ -57,7 +57,7 @@ toast.queue = {}
 
 function ShowSample()
     toast.sample = true
-    toast.text:SetText("|cffb0b0b0Journal moments show here. Drag to move, lock in settings.|r")
+    toast.text:SetText("|cffb0b0b0Lexicon moments show here. Drag to move, lock in settings.|r")
     toast:SetAlpha(1)
     toast:Show()
 end
@@ -124,7 +124,7 @@ Draggable(toast, "toastX", "toastTop", "TOP")
 -- Two sections: active goals, and reminders still waiting for their trigger.
 local TRACKER_W = 230
 local HEADER_FONT = _G.GameFontNormalMed2 and "GameFontNormalMed2" or "GameFontNormal"
-local tracker = CreateFrame("Frame", "BlatoJournalTracker", UIParent)
+local tracker = CreateFrame("Frame", "BlatoLexiconTracker", UIParent)
 tracker:SetSize(TRACKER_W, 20)
 tracker.headers, tracker.lines = {}, {}
 Draggable(tracker, "trackerX", "trackerY", "RIGHT")
@@ -146,7 +146,7 @@ end
 -- right-click opens the journal on the tab of the section under the mouse
 tracker:SetScript("OnMouseUp", function(self, button)
     if button ~= "RightButton" then return end
-    local tab = "notes"   -- Bláto Journal: no Goals page; reminders live with the notes
+    local tab = "notes"   -- Blato Lexicon: no Goals page; reminders live with the notes
     local rh = self.reminderHeader
     if rh and rh:IsShown() then
         local _, cy = GetCursorPosition()
@@ -215,7 +215,7 @@ function UI.UpdateTracker()
             y = y - 3
         end
     end
-    if not anything then Header(Kit.editMode and "Journal tracker" or "|cff808080Journal tracker (drag to move)|r") end
+    if not anything then Header(Kit.editMode and "Lexicon tracker" or "|cff808080Lexicon tracker (drag to move)|r") end
     for i = h + 1, #tracker.headers do tracker.headers[i]:Hide() end
     for i = l + 1, #tracker.lines do tracker.lines[i]:Hide() end
     tracker:SetHeight(-y + 2)
@@ -227,13 +227,13 @@ function UI.RegisterEditMode()
     if editRegistered then return end
     editRegistered = true
     Kit.EditMode({
-        frame = tracker, label = "Journal tracker", key = "tracker", db = DB,
+        frame = tracker, label = "Lexicon tracker", key = "tracker", db = DB,
         get = function() return DB.trackerX, DB.trackerY end,
         set = function(x, y) DB.trackerX, DB.trackerY = x, y; UI.PlaceTracker() end,
         onToggle = function() UI.UpdateTracker() end,
     })
     Kit.EditMode({
-        frame = toast, label = "Journal moments", key = "moments", db = DB,
+        frame = toast, label = "Lexicon moments", key = "moments", db = DB,
         get = function() return DB.toastX, DB.toastTop end,
         set = function(x, y) DB.toastX, DB.toastTop = x, y; UI.PlaceToast() end,
         onToggle = function(active) if active then ShowSample() else UI.PlaceToast() end end,
@@ -261,7 +261,7 @@ end
 -- A Blizzard ButtonFrame: portrait, title, tabs underneath, action buttons in the bottom bar.
 -- The page itself is parchment with dark ink; text stays inside the page's own margins.
 local W, HGT = 620, 580
-local win = CreateFrame("Frame", "BlatoJournalFrame", UIParent, "ButtonFrameTemplate")
+local win = CreateFrame("Frame", "BlatoLexiconFrame", UIParent, "ButtonFrameTemplate")
 win:SetSize(W, HGT)
 win:SetPoint("CENTER")
 win:SetToplevel(true)
@@ -272,11 +272,11 @@ win:RegisterForDrag("LeftButton")
 win:SetScript("OnDragStart", win.StartMoving)
 win:SetScript("OnDragStop", win.StopMovingOrSizing)
 win:Hide()
-tinsert(UISpecialFrames, "BlatoJournalFrame")
+tinsert(UISpecialFrames, "BlatoLexiconFrame")
 -- template children differ between client versions; only use the ones that are really there
 local function Child(f, key) local c = f[key]; return type(c) == "table" and c or nil end
 UI.Child = Child
-if win.SetTitle then win:SetTitle("Bláto Journal") elseif Child(win, "TitleText") then win.TitleText:SetText("Bláto Journal") end
+if win.SetTitle then win:SetTitle("Blato Lexicon") elseif Child(win, "TitleText") then win.TitleText:SetText("Blato Lexicon") end
 local ICON = "Interface/Icons/INV_Misc_Book_09"
 UI.ICON = ICON
 if win.SetPortraitToAsset then win:SetPortraitToAsset(ICON)
@@ -291,13 +291,13 @@ local inset = Child(win, "Inset") or win
 -- Page art --------------------------------------------------------------------------------------
 -- Modern styles use the art of the new windows on this client (group finder, professions, spellbook); see
 -- .harness/forever-art.txt for where each atlas comes from. Modern dark is the default ("auto" tries them in order).
--- Bláto Journal: the look of WoW Forever's own windows is the default (Forever runs on the modern client).
+-- Blato Lexicon: the look of WoW Forever's own windows is the default (Forever runs on the modern client).
 -- Classic is an extra: a parchment page (Media/Parchment ships with the addon) in the old game's dialog frame
 -- (UI.Chrome below).
 local STYLES = {
     { key = "moderndark", label = "Forever", atlases = { "groupfinder-background" }, dark = true },
     { key = "modernparchment", label = "Forever parchment", atlases = { "spellbook-Page-Left-C60" } },
-    { key = "classic", label = "Classic", files = { "Interface\\AddOns\\BlatoJournal\\Media\\Parchment" } },
+    { key = "classic", label = "Classic", files = { "Interface\\AddOns\\BlatoLexicon\\Media\\Parchment" } },
 }
 UI.STYLES = STYLES
 local function TryStyle(tex, s)
@@ -340,7 +340,7 @@ local function Ink(role) return (parchment and INK or DARK)[role] or (parchment 
 local FONTS = {}
 local function PageFont(key, base, extra)
     local src = _G[base] or GameFontHighlight
-    local f = CreateFont("BlatoJournalFont_" .. key)
+    local f = CreateFont("BlatoLexiconFont_" .. key)
     if src then
         f:SetFontObject(src)
         local path, size, flags = src:GetFont()
@@ -356,7 +356,7 @@ PageFont("dim", "GameFontHighlight", 0)
 PageFont("small", "GameFontHighlightSmall", 1)
 -- Display faces for the journal look: Morpheus is the game's own storybook face (quest titles, mail).
 local function DisplayFont(key, size, fallback)
-    local f = CreateFont("BlatoJournalFont_" .. key)
+    local f = CreateFont("BlatoLexiconFont_" .. key)
     f:SetFontObject(_G[fallback] or GameFontNormalLarge)
     if not pcall(f.SetFont, f, "Fonts\\MORPHEUS.TTF", size, "") or not f:GetFont() then f:SetFontObject(_G[fallback] or GameFontNormalLarge) end
     FONTS[key] = f
@@ -422,11 +422,11 @@ local function PlaceScroll()
     content:SetWidth(CW + 4)
 end
 
--- Bláto Journal's own page code lives in the table BJ: this file's main chunk is close to Lua's limit of 200
+-- Blato Lexicon's own page code lives in the table BJ: this file's main chunk is close to Lua's limit of 200
 -- local variables, so the additions take one.
 local BJ = {}
 
--- Classic chrome (Bláto Journal) ------------------------------------------------------------------------
+-- Classic chrome (Blato Lexicon) ------------------------------------------------------------------------
 -- The classic style swaps the modern window art for the old game's dialog frame: dark marble, the grey-gold
 -- border (the client's own BACKDROP_DIALOG_32_32 files) and the title on the header plate. The page inset moves
 -- inside that border. Picking another style brings the modern art and the old positions back.
@@ -458,7 +458,7 @@ function UI.Chrome(on)
         plate:SetShown(hasPlate and true or false)
         BJ.classic.title = BJ.classic:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         BJ.classic.title:SetPoint("TOP", BJ.classic, "TOP", 0, hasPlate and -2 or -16)
-        BJ.classic.title:SetText("Bláto Journal")
+        BJ.classic.title:SetText("Blato Lexicon")
         local close = Child(win, "CloseButton")
         BJ.savedPoints = { inset = inset ~= win and BJ.SavePoints(inset), close = close and BJ.SavePoints(close),
             back = UI.backButton and BJ.SavePoints(UI.backButton) }
@@ -580,7 +580,7 @@ local function Divider()
     Gap(10)
 end
 -- Icons: rounded corners and a thin metal rim like the profession book, from the addon's own art (Art/*.tga).
-local ART = "Interface/AddOns/BlatoJournal/Art/"
+local ART = "Interface/AddOns/BlatoLexicon/Art/"
 function UI.DressIcon(holder, icon, under)
     icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
     if holder.CreateMaskTexture and icon.AddMaskTexture then
@@ -597,7 +597,7 @@ function UI.DressIcon(holder, icon, under)
 end
 -- Icons by purpose. Each is a list tried in order: atlases from the newer UI, then a classic icon file.
 local ICONSET = {
-    commands = { "Interface/Icons/Spell_Nature_EarthElemental_Totem" },   -- Bláto Journal: mud
+    commands = { "Interface/Icons/Spell_Nature_EarthElemental_Totem" },   -- Blato Lexicon: mud
     dungeons = { "UI-HUD-MicroMenu-Groupfinder-Up", "Interface/Icons/INV_Misc_Key_03" },
     journey = { "UI-HUD-MicroMenu-SpellbookAbilities-Up", "Interface/Icons/INV_Misc_Book_09" },
     places = { "Waypoint-MapPin-Tracked", "UI-HUD-MicroMenu-Collections-Up", "Interface/Icons/INV_Misc_Map_01" },
@@ -718,7 +718,7 @@ end
 -- Field-journal pieces ---------------------------------------------------------------------------
 -- The journal's own textures (Media/*.tga, drawn by .harness/textures.py): one shape per piece, a Dark and a
 -- Light version, so both styles share one look. Pieces that stretch are cut 9-slice: fixed corners, stretched edges.
-local MEDIA = "Interface\\AddOns\\BlatoJournal\\Media\\"
+local MEDIA = "Interface\\AddOns\\BlatoLexicon\\Media\\"
 local KIT = {   -- name = { width, height, edge }
     Card = { 32, 32, 10 }, Chip = { 16, 16, 5 }, Field = { 32, 32, 8 }, Paper = { 256, 64, 12 },
     Track = { 64, 16, 7 }, Fill = { 64, 16, 7 }, Badge = { 32, 32, 5 }, Tag = { 128, 48, 20 },
@@ -1013,7 +1013,7 @@ local function BarButtons(list)
     end
 end
 
--- Settings button beside the close button (Options > AddOns > BlatoJournal).
+-- Settings button beside the close button (Options > AddOns > BlatoLexicon).
 do
     local close = Child(win, "CloseButton")
     local gear = CreateFrame("Button", nil, win)
@@ -1027,7 +1027,7 @@ do
     local hl = gear:CreateTexture(nil, "HIGHLIGHT")
     hl:SetAllPoints()
     hl:SetColorTexture(1, 1, 1, 0.2)
-    gear:SetScript("OnClick", function() if BlatoJournal_OpenSettings then BlatoJournal_OpenSettings() end end)
+    gear:SetScript("OnClick", function() if BlatoLexicon_OpenSettings then BlatoLexicon_OpenSettings() end end)
     gear:SetScript("OnEnter", function(self) GameTooltip:SetOwner(self, "ANCHOR_BOTTOM"); GameTooltip:SetText("Settings"); GameTooltip:Show() end)
     gear:SetScript("OnLeave", GameTooltip_Hide)
 end
@@ -1047,7 +1047,7 @@ local function ArchiveLink(kind, top)
 end
 
 -- Tabs -------------------------------------------------------------------------------------
--- Bláto Journal: Commands (the party's buttons) first, the page the journal opens on, then the Dungeon Journal.
+-- Blato Lexicon: Commands (the party's buttons) first, the page the journal opens on, then the Dungeon Journal.
 -- No Goals and no Fellowship page (the fellowship is still counted: the Journey and the Quests pages use it).
 local TABS = { { "commands", "Commands" }, { "dungeons", "Dungeons" }, { "journey", "Journey" }, { "places", "Places" },
     { "quests", "Quests" }, { "notes", "Notes" } }
@@ -1056,7 +1056,7 @@ local current = "commands"
 -- Tabs hang under the window: icon and name, the open one a little longer and lit.
 local tabs = {}
 for i, t in ipairs(TABS) do
-    local tab = CreateFrame("Button", "BlatoJournalFrameTab" .. i, win)
+    local tab = CreateFrame("Button", "BlatoLexiconFrameTab" .. i, win)
     tab.l = tab:CreateTexture(nil, "BACKGROUND")
     tab.r = tab:CreateTexture(nil, "BACKGROUND")
     tab.m = tab:CreateTexture(nil, "BACKGROUND")
@@ -1081,7 +1081,7 @@ for i, t in ipairs(TABS) do
     tab.key = t[1]
     tabs[i] = tab
 end
--- Bláto Journal: in the classic style the tabs are the old character window's tabs (one texture cut in three),
+-- Blato Lexicon: in the classic style the tabs are the old character window's tabs (one texture cut in three),
 -- text only, gold and white; where the client lacks that art they keep the modern look.
 BJ.CLASSIC_TAB = { [true] = "Interface\\PaperDollInfoFrame\\UI-Character-ActiveTab",
     [false] = "Interface\\PaperDollInfoFrame\\UI-Character-InactiveTab" }
@@ -1192,7 +1192,7 @@ search:SetHeight(20)
 search.hint = search:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 search.hint:SetFontObject(FONTS.small)
 search.hint:SetPoint("LEFT", 2, 0)
-search.hint:SetText("Search the journal")
+search.hint:SetText("Search the lexicon")
 search:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
 search:SetScript("OnEnterPressed", function(self) self:ClearFocus() end)
 -- one search field, placed on whichever page is open; each page keeps its own search
@@ -1423,14 +1423,14 @@ local function Body(list, x, timeOnly, key)
     Close()
 end
 
--- Bláto Journal: your own path, under the party's part of the Journey page (RenderJourney below)
+-- Blato Lexicon: your own path, under the party's part of the Journey page (RenderJourney below)
 function BJ.RenderMyPath()
     local levels = {}
     for l in pairs(H.levels) do levels[#levels + 1] = l end
     table.sort(levels, function(a, b) return a > b end)
 
     local who = Who()
-    Text(("%s%s%slevel %d. A journal kept since %s."):format(J.PlayerName(), who ~= "" and (", " .. who) or "", ", ", J.Level(), J.Date(H.started)), "ink")
+    Text(("%s%s%slevel %d. A lexicon kept since %s."):format(J.PlayerName(), who ~= "" and (", " .. who) or "", ", ", J.Level(), J.Date(H.started)), "ink")
     Gap(6)
     if #levels == 0 then Text("The first page is still blank. Go and explore.", "ink") return end
 
@@ -1441,7 +1441,7 @@ function BJ.RenderMyPath()
     local sw = Switch(SHOW_BY, by, 0, top, function(k) DB.journeyBy = k; UI.Render() end)
     local fw = 78
     local sx = sw + 10
-    Find.Field("journey", sx, top, CW - sx - fw - 10, "Search the journal")
+    Find.Field("journey", sx, top, CW - sx - fw - 10, "Search the lexicon")
     -- the Filter button: a chip like the switch (gold while the filters are open, or one is in use)
     local label = filter ~= "all" and (FILTERS_NAME[filter] or filter) or "Filter"
     local lit = filterOpen or filter ~= "all"
@@ -1501,7 +1501,7 @@ function BJ.RenderMyPath()
     end
     table.sort(items, function(a, b) return a.t > b.t end)
     if #items == 0 and (q ~= "" or filter ~= "all") then
-        Text("Nothing in the journal matches that.", "ink")
+        Text("Nothing in the lexicon matches that.", "ink")
         return
     end
 
@@ -1576,7 +1576,7 @@ function BJ.RenderMyPath()
     VLine(20, lineTop, y + 20)
 end
 
--- Bláto Journal: the Journey page is about the three of you first: time, quests and dungeons together (runs,
+-- Blato Lexicon: the Journey page is about the three of you first: time, quests and dungeons together (runs,
 -- clears, bosses) and the firsts you shared. Your own path follows, as the journal kept it before.
 BJ.DUNGEON_ICON = "Interface/Icons/INV_Misc_Key_03"
 local function RenderJourney()
@@ -1941,7 +1941,7 @@ local function RenderPlaces()
 end
 function UI.OpenPlace(zone) openPlace = zone; UI.Show("places") end
 
--- Bláto Journal: no Goals page, its code is gone. Shift-clicked links still go into the note boxes.
+-- Blato Lexicon: no Goals page, its code is gone. Shift-clicked links still go into the note boxes.
 -- Clients route shift-clicked links through different functions, so listen on every one that exists.
 UI.linkBoxes = {}   -- note boxes that take shift-clicked links (added below)
 local lastLink, lastLinkTime = nil, 0
@@ -2066,7 +2066,7 @@ composer.pin:SetPoint("RIGHT", composer.pinText, "LEFT", -2, 0)
 composer.save = Kit.Make("Button", composer, "UIPanelButtonTemplate")
 composer.save:SetSize(110, 22)
 composer.save:SetPoint("BOTTOMRIGHT", -12, 12)
--- Bláto Journal: the note goes to the party's shared notepad too (Together.lua)
+-- Blato Lexicon: the note goes to the party's shared notepad too (Together.lua)
 composer.shareText = composer:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 composer.shareText:SetText("Share with the party")
 composer.shareText:SetPoint("RIGHT", composer.save, "LEFT", -12, 0)
@@ -2197,7 +2197,7 @@ local function RenderNotes()
     Find.Field("notes", 0, y, CW, "Search notes")
     Gap(40)
 
-    -- Bláto Journal: the party's shared notepad (Together.lua), your shared notes and your friends', newest first
+    -- Blato Lexicon: the party's shared notepad (Together.lua), your shared notes and your friends', newest first
     local T = ns.Together
     if T then
         T.AskNotes()
@@ -2376,7 +2376,7 @@ local function RenderOpenQuests(list, by)
                 title:SetPoint("TOPLEFT", 60, rowTop - 8)
                 local where = s and ((s.subzone and s.zone and s.subzone ~= s.zone) and (s.subzone .. ", " .. s.zone) or s.zone) or nil
                 local sub = Text(s and ("Picked up %s%s  ·  level %d"):format(where and ("in " .. where .. "  ·  ") or "", date("%b %d, %H:%M", s.t), s.level or q.level or 0)
-                    or ("Quest level %d  ·  taken before the journal kept track"):format(q.level or 0), "small", 60, 110, true)
+                    or ("Quest level %d  ·  taken before the lexicon kept track"):format(q.level or 0), "small", 60, 110, true)
                 sub:SetPoint("TOPLEFT", 60, rowTop - 12 - title:GetStringHeight())
                 sub:SetWordWrap(false)
                 -- right: how far along, and how long you have had it
@@ -2413,7 +2413,7 @@ local function RenderOpenQuests(list, by)
         end
     end
 end
--- Bláto Journal: who of the three of you has done a quest (Together.lua): the game's ready-check marks, a tick
+-- Blato Lexicon: who of the three of you has done a quest (Together.lua): the game's ready-check marks, a tick
 -- for done, a cross and red ink for not done, a question mark while nobody has said. mine: your own state, when
 -- the quest is not one of yours (a friend's quest you have not done).
 BJ.MARK = { [true] = "|TInterface\\RaidFrame\\ReadyCheck-Ready:13|t", [false] = "|TInterface\\RaidFrame\\ReadyCheck-NotReady:13|t" }
@@ -2498,7 +2498,7 @@ local function RenderQuests()
     Gap(40)
     if view == "open" then return RenderOpenQuests(open, mode[1]) end
 
-    -- Bláto Journal: quests your friends handed in that you have not done (yet)
+    -- Blato Lexicon: quests your friends handed in that you have not done (yet)
     local behind = {}
     for id, p in pairs(H.partyQuests or {}) do
         if ns.Together and ns.Together.Done(id) ~= true and Find.Match(p.title or "") then
@@ -2595,7 +2595,7 @@ local function RenderQuests()
                         lines[#lines + 1] = { ("Picked up %s  ·  handed in %s  ·  took %s"):format(date("%b %d, %H:%M", q.started), date("%H:%M", q.t),
                             J.Dur(math.max(0, q.t - q.started))), "small" }
                     end
-                    if #lines == 0 then lines[1] = { "Handed in before the journal kept a quest's story.", "small" } end
+                    if #lines == 0 then lines[1] = { "Handed in before the lexicon kept a quest's story.", "small" } end
                     Gap(-6)
                     for _, l in ipairs(lines) do
                         local fs = Text(l[1], l[2], 60, 20)
@@ -2873,11 +2873,11 @@ function Fellow.Render()
     Fellow.List()
 end
 
--- Bláto Journal: no Fellowship page; the three of you are on the Journey page
+-- Blato Lexicon: no Fellowship page; the three of you are on the Journey page
 function UI.OpenFellow() UI.Show("journey") end
 
 -- Bláto ---------------------------------------------------------------------------------------
--- Bláto Journal: the party side (Party/, from One More Quest) as buttons, grouped like its feature list. The
+-- Blato Lexicon: the party side (Party/, from One More Quest) as buttons, grouped like its feature list. The
 -- buttons come from ns.BlatoPage (Blato.lua); each section folds like the other headers of the journal.
 -- A plain button runs its /blato command, a switch flips and shows on or off; the tooltip names the command.
 BJ.COLS, BJ.ROW_H, BJ.GAP = 3, 30, 8
@@ -2954,7 +2954,7 @@ function BJ.RenderCommands()
 end
 
 -- Dungeons ------------------------------------------------------------------------------------
--- Bláto Journal: the Dungeons tab is "Dungeon Journal" by Exehn (CurseForge), installed as its own addon: its
+-- Blato Lexicon: the Dungeons tab is "Dungeon Journal" by Exehn (CurseForge), installed as its own addon: its
 -- code is not ours to ship. While the tab is open its window sits exactly over the journal window, which takes its
 -- size, so the journal's tabs hang under it; dragging it drags the journal, closing it closes the journal. Any
 -- other tab, or closing the journal, puts it back where it was.
@@ -3027,7 +3027,7 @@ function BJ.RenderDungeons()
     end
 end
 
--- Bláto Journal: no Goals and no Fellowship page (their code above stays unused)
+-- Blato Lexicon: no Goals and no Fellowship page (their code above stays unused)
 local RENDER = { commands = BJ.RenderCommands, dungeons = BJ.RenderDungeons, journey = RenderJourney, places = RenderPlaces,
     quests = RenderQuests, notes = RenderNotes }
 
@@ -3095,7 +3095,7 @@ end
 
 -- Quick note slip --------------------------------------------------------------------------------
 -- A small parchment slip for writing on the move (keybind, minimap button right-click, /note).
-local dlg = CreateFrame("Frame", "BlatoJournalNoteDialog", UIParent, "BasicFrameTemplateWithInset")
+local dlg = CreateFrame("Frame", "BlatoLexiconNoteDialog", UIParent, "BasicFrameTemplateWithInset")
 dlg:SetSize(500, 236)
 dlg:SetPoint("TOP", 0, -160)
 dlg:SetFrameStrata("DIALOG")
@@ -3105,7 +3105,7 @@ dlg:RegisterForDrag("LeftButton")
 dlg:SetScript("OnDragStart", dlg.StartMoving)
 dlg:SetScript("OnDragStop", dlg.StopMovingOrSizing)
 dlg:Hide()
-tinsert(UISpecialFrames, "BlatoJournalNoteDialog")
+tinsert(UISpecialFrames, "BlatoLexiconNoteDialog")
 dlg.title = Child(dlg, "TitleText") or dlg:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 if not Child(dlg, "TitleText") then dlg.title:SetPoint("TOP", 0, -5) end
 dlg.title:SetText("Quick note")
@@ -3145,7 +3145,7 @@ slipPin.label:SetPoint("RIGHT", slip, "BOTTOMRIGHT", -26, 36)
 slipPin.label:SetText("Pin to Journey")
 slipPin:SetPoint("RIGHT", slipPin.label, "LEFT", -2, 0)
 slipPin:SetScript("OnClick", function() slipEdit:SetFocus() end)
--- Bláto Journal: share the note with the party (Together.lua); starts from the "Share new notes" option
+-- Blato Lexicon: share the note with the party (Together.lua); starts from the "Share new notes" option
 dlg.shareText = dlg:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 dlg.shareText:SetText("Share with the party")
 dlg.shareText:SetPoint("RIGHT", slipPin, "LEFT", -12, 0)
@@ -3172,7 +3172,7 @@ end
 local function SaveSlip()
     local trigger = slipRow.trigger
     if J.AddNote(slipEdit:GetText(), trigger, slipRow.every:GetChecked(), slipPin:GetChecked(), dlg.share:GetChecked() and true or false) then
-        J.Moment(trigger and ("|cffb0b0b0Noted. Reminder set: %s.|r"):format(J.TriggerLabel(trigger):gsub("^%u", string.lower)) or "|cffb0b0b0Noted in your journal.|r", "note")
+        J.Moment(trigger and ("|cffb0b0b0Noted. Reminder set: %s.|r"):format(J.TriggerLabel(trigger):gsub("^%u", string.lower)) or "|cffb0b0b0Noted in your lexicon.|r", "note")
     end
     slipEdit:SetText("")
     slipEdit:ClearFocus()
@@ -3195,9 +3195,9 @@ function UI.NoteDialog()
     C_Timer.After(0, function() slipEdit:SetFocus() end)
 end
 
--- /bj why: after the next click, report what was under the mouse and what has the keyboard.
+-- /bl why: after the next click, report what was under the mouse and what has the keyboard.
 function UI.Why()
-    print("|cffffd100BlatoJournal:|r click the box that won't take typing.")
+    print("|cffffd100BlatoLexicon:|r click the box that won't take typing.")
     local down = false
     local watcher = CreateFrame("Frame")
     watcher:SetScript("OnUpdate", function(self)

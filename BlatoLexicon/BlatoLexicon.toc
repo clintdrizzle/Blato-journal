@@ -1,14 +1,14 @@
 ## Interface: 16001, 120100, 120105
-## Title: Bláto Journal
-## Notes: Journal and party features for a group of three friends on WoW Forever. Open it from the minimap button or with /blato
+## Title: Blato Lexicon
+## Notes: A lexicon of your journey and party features for a group of three friends on WoW Forever. Open it from the minimap button or with /blato
 ## Author: Bláto party (based on ForeverJournal by Ugge Zen and One More Quest by MadDadVibe)
 ## IconTexture: Interface/Icons/Spell_Nature_EarthElemental_Totem
 ## X-License: GPL-3.0
-## Version: 0.1.2
+## Version: 0.2.0
 ## OptionalDeps: !ForeverData, !ForeverDataProtect, ForeverDungeonJournal
 ## SavedVariables: BJ_DB, BJ_Chars, BlatoPartyDB
 ## SavedVariablesPerCharacter: BJ_DBC, BJ_Char
-## AddonCompartmentFunc: BlatoJournal_Toggle
+## AddonCompartmentFunc: BlatoLexicon_Toggle
 
 # the journal (from ForeverJournal)
 Journal\Kit.lua
@@ -104,6 +104,6 @@ Party\UI\Milestones.lua
 Party\UI\Minimap.lua
 Party\Main.lua
 
-# Bláto Journal: who of the three did a quest (Quests page), and the Commands page (every party feature as a button)
+# Blato Lexicon: who of the three did a quest (Quests page), and the Commands page (every party feature as a button)
 Together.lua
 Blato.lua

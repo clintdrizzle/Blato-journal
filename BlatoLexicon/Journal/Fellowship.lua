@@ -1,4 +1,4 @@
--- BlatoJournal fellowship: everyone you group with. Per companion: when, where and at which levels you met,
+-- BlatoLexicon fellowship: everyone you group with. Per companion: when, where and at which levels you met,
 -- time grouped (split into dungeons, fighting, travelling and time in town), the levels you gained side by side,
 -- quests done together and dungeon runs together. Counted each second you share a group; names the game keeps
 -- secret (inside some instances) are skipped rather than guessed.
@@ -51,7 +51,7 @@ local login = CreateFrame("Frame")
 login:RegisterEvent("PLAYER_LOGIN")
 login:SetScript("OnEvent", function()
     local ok, err = pcall(Migrate)
-    if not ok and DB.debug then print("|cffff6060BlatoJournal fellowship:|r " .. tostring(err)) end
+    if not ok and DB.debug then print("|cffff6060BlatoLexicon fellowship:|r " .. tostring(err)) end
 end)
 J.FellowMigrate = Migrate   -- for the test harness
 -- Group members on a quest: when the game can tell (C_QuestLog.IsUnitOnQuest), only those who have it too.
@@ -125,7 +125,7 @@ local function Tick()
             end
         end
     end
-    -- Bláto Journal: a second with both party mates in the group counts for the three of you
+    -- Blato Lexicon: a second with both party mates in the group counts for the three of you
     local a, b = J.PartyMates()
     local here = {}
     for _, n in ipairs(names) do here[n] = true end
@@ -136,7 +136,7 @@ local function Tick()
     end
 end
 
--- The party of three (Bláto Journal) -----------------------------------------------------------------------
+-- The party of three (Blato Lexicon) -----------------------------------------------------------------------
 -- Your two party mates are the two companions you have spent the most time grouped with.
 function J.PartyMates()
     local list = {}
@@ -225,6 +225,6 @@ end
 C_Timer.NewTicker(1, function()
     if not (J.H and J.H.levels) then return end
     local ok, err = pcall(Tick)
-    if not ok and DB.debug then print("|cffff6060BlatoJournal fellowship:|r " .. tostring(err)) end
+    if not ok and DB.debug then print("|cffff6060BlatoLexicon fellowship:|r " .. tostring(err)) end
 end)
 J.FellowTick = Tick   -- for the test harness

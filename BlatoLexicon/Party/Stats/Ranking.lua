@@ -61,7 +61,7 @@ R.formats = {
 local ALL = {
     { heading = "Time and gold" },
     { key = "ptime",   label = "Time in session",    label2 = "Time in sessions", best = "high", fmt = "duration", session = true, life = true },
-    { key = "afk",     label = "Time AFK",           best = "low",  fmt = "duration", session = true },   -- Bláto Journal
+    { key = "afk",     label = "Time AFK",           best = "low",  fmt = "duration", session = true },   -- Blato Lexicon
     { key = "gold",    label = "Gold gained",        label2 = "Gold earned",      best = "high", fmt = "gold", session = true, life = true },
     { key = "curgold", label = "Current gold",       best = "high", fmt = "gold", session = true },
     { key = "yards",   label = "Yards walked",       best = "high", fmt = "compact", session = true, life = true },

@@ -1,0 +1,8 @@
+<Bindings>
+    <Binding name="BLATOLEXICON_TOGGLE" header="BLATOLEXICON" category="ADDONS">
+        BlatoLexicon_Toggle()
+    </Binding>
+    <Binding name="BLATOLEXICON_NOTE" category="ADDONS">
+        BlatoLexicon_Note()
+    </Binding>
+</Bindings>

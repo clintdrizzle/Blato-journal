@@ -1,4 +1,4 @@
--- BlatoJournal reminders: a note can carry a trigger ("when I enter Undercity", "at a vendor") and shows up
+-- BlatoLexicon reminders: a note can carry a trigger ("when I enter Undercity", "at a vendor") and shows up
 -- as a moment when it happens. Triggers are suggested from the note's text; the writer confirms or changes them.
 local _, ns = ...
 local J = ns.J

@@ -1,12 +1,12 @@
 name: Check and release
 
-# Every push checks the addon (Lua syntax, TOC). A new version in BlatoJournal.toc is released as
+# Every push checks the addon (Lua syntax, TOC). A new version in BlatoLexicon.toc is released as
 # v<version> with the zip, but only when the check passed. (Adapted from One More Quest's workflow.)
 on:
   push:
     branches: [main]
     paths:
-      - "BlatoJournal/**"
+      - "BlatoLexicon/**"
       - ".github/workflows/release.yml"
   pull_request:
   workflow_dispatch:
@@ -37,15 +37,15 @@ jobs:
           bad=0
           while IFS= read -r -d '' f; do
             luac5.1 -p "$f" || bad=1
-          done < <(find BlatoJournal -name '*.lua' -print0)
+          done < <(find BlatoLexicon -name '*.lua' -print0)
           exit $bad
 
       - name: TOC
         run: |
           python3 - <<'PY'
           import os, re, sys
-          root = "BlatoJournal"
-          toc = open(os.path.join(root, "BlatoJournal.toc"), encoding="utf-8").read()
+          root = "BlatoLexicon"
+          toc = open(os.path.join(root, "BlatoLexicon.toc"), encoding="utf-8").read()
           listed = [l.strip().replace("\\", "/") for l in toc.splitlines() if l.strip() and not l.startswith("#")]
           files = sorted(os.path.relpath(os.path.join(r, f), root).replace(os.sep, "/")
                          for r, _, fs in os.walk(root) for f in fs if f.endswith(".lua"))
@@ -69,7 +69,7 @@ jobs:
       - name: Read version
         id: v
         run: |
-          ver=$(sed -n 's/^## Version: *//p' BlatoJournal/BlatoJournal.toc | tr -d '\r')
+          ver=$(sed -n 's/^## Version: *//p' BlatoLexicon/BlatoLexicon.toc | tr -d '\r')
           echo "version=$ver" >> "$GITHUB_OUTPUT"
 
       - name: Publish release
@@ -80,7 +80,7 @@ jobs:
           if gh release view "v$VER" >/dev/null 2>&1; then
             echo "Release v$VER exists, nothing to do"; exit 0
           fi
-          zip -qr "BlatoJournal_v$VER.zip" BlatoJournal
-          gh release create "v$VER" "BlatoJournal_v$VER.zip" \
-            --title "Bláto Journal v$VER" \
+          zip -qr "BlatoLexicon_v$VER.zip" BlatoLexicon
+          gh release create "v$VER" "BlatoLexicon_v$VER.zip" \
+            --title "Blato Lexicon v$VER" \
             --notes "Unzip into the Interface/AddOns folder of your WoW Forever installation, then /reload in the game."

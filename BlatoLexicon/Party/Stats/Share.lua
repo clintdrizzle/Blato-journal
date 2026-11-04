@@ -10,7 +10,7 @@ OMQ.statKeys = KEYS
 -- the rows added by decision 120 go in a second message (255 byte limit)
 local KEYS2 = { "ptime", "xp", "xpkill", "xpquest", "xpdisc", "quests", "fights", "heal",
                 "fallx", "falld", "drownd", "lava", "aucp", "aucb", "need", "greed", "gamble", "betswon", "nextlvl", "yfollow",
-                "afk" }          -- Bláto Journal: time AFK, last so older clients just ignore it
+                "afk" }          -- Blato Lexicon: time AFK, last so older clients just ignore it
 
 local function encodeValue(v)
     if type(v) ~= "number" then return "" end

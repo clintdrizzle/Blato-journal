@@ -1,6 +1,6 @@
 -- One More Quest: Core
 -- Namespace, event bus, saved variables, player identity.
--- Bláto Journal: the party features get a table of their own, so they never share fields with the journal
+-- Blato Lexicon: the party features get a table of their own, so they never share fields with the journal
 -- (ns.J, ns.UI, ns.Kit); the journal reaches them as ns.OMQ.
 local ADDON, ns = ...
 local OMQ = {}
@@ -153,7 +153,7 @@ SlashCmdList["BLATOPARTY"] = function(input)
     input = (input or ""):match("^%s*(.-)%s*$")
     local cmd, rest = input:match("^(%S+)%s*(.*)$")
     if not cmd then
-        -- Bláto Journal: "/blato" alone opens the journal on the Commands page; the vote is "/blato sleep"
+        -- Blato Lexicon: "/blato" alone opens the journal on the Commands page; the vote is "/blato sleep"
         if ns.UI and ns.UI.Show then ns.UI.Show("commands") else OMQ:Fire("SLASH_EMPTY") end
         return
     end

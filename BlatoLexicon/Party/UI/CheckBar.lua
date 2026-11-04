@@ -16,7 +16,7 @@ local expanded, suppressed = false, false
 local flipped = false
 
 -- icons in the "engraved stone" style (decision 192), rendered into Media
-local MEDIA = "Interface\\AddOns\\BlatoJournal\\Party\\Media\\"
+local MEDIA = "Interface\\AddOns\\BlatoLexicon\\Party\\Media\\"
 local ITEMS = {
     { id = "ready", label = "Group Check", tip = "Click: durability, bags, drinks and class items of the group",
       icon = MEDIA .. "Icon_Check" },

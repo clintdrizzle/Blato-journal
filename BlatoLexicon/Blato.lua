@@ -1,4 +1,4 @@
--- Bláto Journal: what the Bláto page of the journal offers (UI.lua draws it, RenderBlato).
+-- Blato Lexicon: what the Bláto page of the journal offers (UI.lua draws it, RenderBlato).
 -- Every feature of the party side (Party/, from One More Quest) as a button, grouped like its feature list:
 --   cmd   runs "/blato <cmd> <arg>" (the tooltip shows the command, so it can go on a macro too)
 --   toggle  a switch: { get, set }; the button shows on or off
@@ -38,7 +38,7 @@ ns.BlatoPage = {
         { "Tonight in numbers", I .. "INV_Misc_PocketWatch_01", "Hover: the statistics of tonight for the whole party (XP per hour, gold, yards, deaths...). Click: the lifetime window.",
           hover = "stats", cmd = "lifetime" },
         { "Lifetime stats", I .. "INV_Misc_Book_11", "Every friend's character over its whole life, also the ones offline right now.", cmd = "lifetime" },
-        { "Who has the addon", I .. "INV_BannerPVP_02", "Lists the friends whose game runs Bláto Journal.", cmd = "users" },
+        { "Who has the addon", I .. "INV_BannerPVP_02", "Lists the friends whose game runs Blato Lexicon.", cmd = "users" },
         { "Share quests now", I .. "INV_Scroll_03", "Starts a sync round: everybody shares the quests the others are missing.", cmd = "quests", arg = "sync" },
         { "Quest tracker test", I .. "INV_Misc_Note_02", "Shows the group quest tracker with a demo card, to see where it sits.", cmd = "qtrack", arg = "demo" },
         { "Follow key", I .. "Ability_Mount_RidingHorse", "The key that follows the closest friend. Set it with /blato follow <key>.", cmd = "follow" },

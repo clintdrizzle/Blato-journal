@@ -37,7 +37,7 @@ local function newSession()
         statBase = {},                   -- game statistics at session start (decision 120)
         biggestHit = 0, hitApprox = false,
         foodSeconds = 0, onlineSeconds = 0,
-        afkSeconds = 0,                  -- Bláto Journal: seconds with the game's AFK flag on
+        afkSeconds = 0,                  -- Blato Lexicon: seconds with the game's AFK flag on
         members = {},                    -- guid -> { name, class } of addon users met
     }
 end
@@ -535,7 +535,7 @@ local wellFedName
 local hasFood = false
 local function sampleFood()
     s.onlineSeconds = s.onlineSeconds + 1
-    -- Bláto Journal: time AFK (the game's own flag: /afk or idle for a few minutes). It can be secret inside
+    -- Blato Lexicon: time AFK (the game's own flag: /afk or idle for a few minutes). It can be secret inside
     -- instances; a secret value counts as not AFK.
     local afk = UnitIsAFK and UnitIsAFK("player")
     if issecretvalue and issecretvalue(afk) then afk = false end

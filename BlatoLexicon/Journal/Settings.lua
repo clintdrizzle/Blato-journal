@@ -1,33 +1,33 @@
--- BlatoJournal settings page, key bindings and slash commands.
+-- BlatoLexicon settings page, key bindings and slash commands.
 local _, ns = ...
 local J, UI, Kit = ns.J, ns.UI, ns.Kit
 local DB, H = J.DB, J.H
 
-BINDING_HEADER_BLATOJOURNAL = "Bláto Journal"
-BINDING_NAME_BLATOJOURNAL_TOGGLE = "Open or close the journal"
-BINDING_NAME_BLATOJOURNAL_NOTE = "Take a quick note"
-function BlatoJournal_Toggle() UI.Toggle() end
-function BlatoJournal_Note() UI.NoteDialog() end
+BINDING_HEADER_BLATOLEXICON = "Blato Lexicon"
+BINDING_NAME_BLATOLEXICON_TOGGLE = "Open or close the lexicon"
+BINDING_NAME_BLATOLEXICON_NOTE = "Take a quick note"
+function BlatoLexicon_Toggle() UI.Toggle() end
+function BlatoLexicon_Note() UI.NoteDialog() end
 
 local function Get(k) return function() return DB[k] end end
 local function Set(k) return function(v) DB[k] = v; UI.PlaceToast(); UI.PlaceTracker(); UI.ApplyStyle(); UI.UpdateMinimapButton() end end
 local function Seconds(v) return Kit.FormatNumber(v, 0.5) .. "s" end
 local function Percent(v) return ("%d%%"):format(v * 100 + 0.5) end
 
-local page = Kit.NewPage("Bláto Journal")
-page:Text("A journal of your character's journey: where each level was spent, the places you found, the dungeons you cleared together and the notes you took. "
+local page = Kit.NewPage("Blato Lexicon")
+page:Text("A lexicon of your character's journey: where each level was spent, the places you found, the dungeons you cleared together and the notes you took. "
     .. "No rates, no countdowns.", "GameFontHighlightSmall")
-page:Button("Journal", "Open journal", function() UI.Show() end)
+page:Button("Lexicon", "Open lexicon", function() UI.Show() end)
 
-page:Section("Journal")
-page:Check("Minimap button", Get("minimap"), Set("minimap"), "Left-click opens the journal, right-click writes a quick note. Drag it around the minimap's edge.")
+page:Section("Lexicon")
+page:Check("Minimap button", Get("minimap"), Set("minimap"), "Left-click opens the lexicon, right-click writes a quick note. Drag it around the minimap's edge.")
 local styles = {}
 for _, s in ipairs(UI.STYLES) do styles[#styles + 1] = { s.key, s.label } end
 page:Dropdown("Page style", styles, Get("style"), Set("style"))
 page:Check("Pin new notes to the Journey", Get("autoPin"), Set("autoPin"),
     "New notes also show on the Journey page, under the level you wrote them. The quick note slip has its own tick box for each note.")
 page:Check("Share new notes with the party", function() return DB.shareNotes ~= false end, Set("shareNotes"),
-    "New notes go to the shared notepad: your friends in the group with Bláto Journal see them on their Notes page. "
+    "New notes go to the shared notepad: your friends in the group with Blato Lexicon see them on their Notes page. "
     .. "Each note has its own tick box, and Share / Unshare on the Notes page.")
 page:Text(function()
     local used = UI.usedStyle or "dark"
@@ -35,8 +35,8 @@ page:Text(function()
     return ""
 end, "GameFontDisableSmall")
 
-page:Section("Journal detail")
-page:Text("Everything is always written down; this only chooses what the pages show. Change it any time, and the journal "
+page:Section("Lexicon detail")
+page:Text("Everything is always written down; this only chooses what the pages show. Change it any time, and the lexicon "
     .. "shows its whole history the new way.", "GameFontDisableSmall")
 local function Render() if UI.Render then UI.Render() end end
 local presets = {}
@@ -99,7 +99,7 @@ page:Slider("Reminders stay on screen", 3, 20, 1, Get("reminderSeconds"), Set("r
 page:Section("Sounds")
 page:Check("Play sounds", Get("sounds"), Set("sounds"), "Sounds play even when the moment's text is turned off.")
 page:Check("Play when game effects are muted", Get("soundMaster"), Set("soundMaster"),
-    "Use the master volume channel, so journal sounds are heard with sound effects turned off.")
+    "Use the master volume channel, so lexicon sounds are heard with sound effects turned off.")
 for _, ev in ipairs({
     { "zone", "New place" }, { "dungeon", "First dungeon visit" },
     { "level", "Level summary" }, { "rested", "Well rested" }, { "note", "Note saved" }, { "reminder", "Reminder" },
@@ -110,8 +110,8 @@ for _, ev in ipairs({
     end)
 end
 
-page:Section("Journal tracker")
-page:Text("A short list under the objective tracker. Right-click it to open the journal. With ForeverImmersion, choose when it "
+page:Section("Lexicon tracker")
+page:Text("A short list under the objective tracker. Right-click it to open the lexicon. With ForeverImmersion, choose when it "
     .. "shows on the Elements page.", "GameFontDisableSmall")
 page:Check("Show pending reminders", Get("trackerReminders"), Set("trackerReminders"),
     "Reminders still waiting for their trigger, with the trigger underneath.")
@@ -119,19 +119,19 @@ page:Slider("Reminders shown", 1, 10, 1, Get("trackerReminderMax"), Set("tracker
 
 page:Section("Positions")
 page:Check("Lock positions", Get("locked"), Set("locked"),
-    "Unlock to drag the moments line and the journal tracker. You can also move them in Blizzard's Edit Mode, per layout.")
+    "Unlock to drag the moments line and the lexicon tracker. You can also move them in Blizzard's Edit Mode, per layout.")
 
 page:Section("Keys")
 page:Text(function()
     local function Key(b) local k = GetBindingKey and GetBindingKey(b); return k and ("|cffffd100" .. (GetBindingText and GetBindingText(k) or k) .. "|r") or "|cff808080not bound|r" end
-    return ("Open journal: %s.   Quick note: %s.\nBind them in Options > Keybindings > AddOns. The minimap button does both, and |cffffd100/bj|r and |cffffd100/note|r work too.")
-        :format(Key("BLATOJOURNAL_TOGGLE"), Key("BLATOJOURNAL_NOTE"))
+    return ("Open lexicon: %s.   Quick note: %s.\nBind them in Options > Keybindings > AddOns. The minimap button does both, and |cffffd100/bl|r and |cffffd100/note|r work too.")
+        :format(Key("BLATOLEXICON_TOGGLE"), Key("BLATOLEXICON_NOTE"))
 end, "GameFontHighlightSmall")
 
 page:SaveStatus()
 page:Section("Other")
-StaticPopupDialogs.BLATOJOURNAL_CLEAR = {
-    text = "Clear this character's whole journal? Levels, places, quests and notes are all forgotten.",
+StaticPopupDialogs.BLATOLEXICON_CLEAR = {
+    text = "Clear this character's whole lexicon? Levels, places, quests and notes are all forgotten.",
     button1 = YES or "Yes", button2 = NO or "No",
     OnAccept = function()
         wipe(H)
@@ -140,10 +140,10 @@ StaticPopupDialogs.BLATOJOURNAL_CLEAR = {
     end,
     timeout = 0, whileDead = true, hideOnEscape = true,
 }
-page:Button("Clear journal", "Clear", function() StaticPopup_Show("BLATOJOURNAL_CLEAR") end, "Start this character's journal from a blank page.")
+page:Button("Clear lexicon", "Clear", function() StaticPopup_Show("BLATOLEXICON_CLEAR") end, "Start this character's lexicon from a blank page.")
 Kit.Register(page)
 
-function BlatoJournal_OpenSettings() Kit.Open(page) end
+function BlatoLexicon_OpenSettings() Kit.Open(page) end
 
 -- Place things once saved positions are known.
 local ev = CreateFrame("Frame")
@@ -156,16 +156,16 @@ ev:SetScript("OnEvent", function()
     C_Timer.After(1, UI.PlaceTracker)   -- the objective tracker settles its size a moment after login
 end)
 
-SLASH_BLATOJOURNAL1 = "/bj"
-SLASH_BLATOJOURNAL2 = "/journal"
-SlashCmdList.BLATOJOURNAL = function(msg)
+SLASH_BLATOLEXICON1 = "/bl"
+SLASH_BLATOLEXICON2 = "/lexicon"
+SlashCmdList.BLATOLEXICON = function(msg)
     local cmd, rest = msg:match("^(%S*)%s*(.-)$")
     cmd = cmd:lower()
-    -- Developer commands (design checks, API probes) only answer in debug mode: /bj debug turns it on or off.
+    -- Developer commands (design checks, API probes) only answer in debug mode: /bl debug turns it on or off.
     local DEV = { icons = true, art = true, name = true, tour = true, blank = true, corners = true, events = true, target = true, boss = true }
     if cmd == "debug" then
         J.DB.debug = not J.DB.debug or nil
-        print("BlatoJournal: debug mode " .. (J.DB.debug and "on. Extra commands: art, icons, name, tour, blank, corners, events." or "off."))
+        print("BlatoLexicon: debug mode " .. (J.DB.debug and "on. Extra commands: art, icons, name, tour, blank, corners, events." or "off."))
         return
     end
     if DEV[cmd] and not J.DB.debug then cmd = "" end
@@ -185,7 +185,7 @@ SlashCmdList.BLATOJOURNAL = function(msg)
         local f = GetMouseFoci and GetMouseFoci()[1] or GetMouseFocus and GetMouseFocus()
         while f and f:GetParent() and f:GetParent() ~= UIParent do f = f:GetParent() end
         local root = f and f.GetName and f:GetName()
-        if type(root) ~= "string" then print("BlatoJournal: hover a window first, then type /bj art") return end
+        if type(root) ~= "string" then print("BlatoLexicon: hover a window first, then type /bl art") return end
         local seen, out = {}, {}
         local function PK(o) local k = o.GetParentKey and o:GetParentKey(); return type(k) == "string" and k or nil end
         local function Walk(frame, path, depth)
@@ -209,7 +209,7 @@ SlashCmdList.BLATOJOURNAL = function(msg)
         Walk(f, root, 0)
         DB._art = DB._art or {}
         DB._art[root] = out
-        print(("BlatoJournal: recorded %d textures from %s. Do this for each window, then /reload."):format(#out, root))
+        print(("BlatoLexicon: recorded %d textures from %s. Do this for each window, then /reload."):format(#out, root))
     elseif cmd == "name" then
         -- which call gives the full (first + last) name on this client
         local function show(label, f, ...)
@@ -218,7 +218,7 @@ SlashCmdList.BLATOJOURNAL = function(msg)
             if issecretvalue and (issecretvalue(a) or issecretvalue(b)) then print(label, "<secret>") return end
             print(label, tostring(a), b ~= nil and tostring(b) or "")
         end
-        print("|cffffd100BlatoJournal names:|r")
+        print("|cffffd100BlatoLexicon names:|r")
         show("UnitName:", UnitName, "player")
         if UnitFullName then show("UnitFullName:", UnitFullName, "player") end
         if GetUnitName then show("GetUnitName:", GetUnitName, "player", true) end
@@ -251,14 +251,14 @@ SlashCmdList.BLATOJOURNAL = function(msg)
         local function Step()
             i = i + 1
             local st = steps[i]
-            if not st then DB.style = keep; J.DB.questView = "done"; UI.ApplyStyle(); print("BlatoJournal tour: done"); return end
+            if not st then DB.style = keep; J.DB.questView = "done"; UI.ApplyStyle(); print("BlatoLexicon tour: done"); return end
             if DB.style ~= st[1] then DB.style = st[1]; UI.ApplyStyle() end
             J.DB.questView = st[2] == "questsopen" and "open" or "done"
             if st[2] == "place" then UI.OpenPlace(zone or "")
             elseif st[2] == "dungeon" then UI.OpenPlace(dungeon and ("dungeon:" .. dungeon) or "")
             elseif st[2] == "questsopen" then UI.Show("quests")
             else UI.Show(st[2]) end
-            print(("BlatoJournal tour %d: %s %s"):format(i, st[1], st[2]))
+            print(("BlatoLexicon tour %d: %s %s"):format(i, st[1], st[2]))
             C_Timer.After(4, Step)
         end
         Step()
@@ -267,7 +267,7 @@ SlashCmdList.BLATOJOURNAL = function(msg)
         local mapID = C_Map.GetBestMapForUnit("player")
         local info = mapID and C_Map.GetMapInfo(mapID)
         local zone = info and info.name or GetZoneText()
-        print(("BlatoJournal corners: map %s (%s)"):format(tostring(mapID), tostring(zone)))
+        print(("BlatoLexicon corners: map %s (%s)"):format(tostring(mapID), tostring(zone)))
         -- 1) exploration achievement ("Explore <zone>") criteria
         local found
         if GetCategoryList and GetCategoryNumAchievements and GetAchievementInfo then
@@ -307,11 +307,11 @@ SlashCmdList.BLATOJOURNAL = function(msg)
         end
     elseif cmd == "events" then
         J.DB.logEvents = not J.DB.logEvents or nil
-        print("BlatoJournal: event log " .. (J.DB.logEvents and "on" or "off"))
+        print("BlatoLexicon: event log " .. (J.DB.logEvents and "on" or "off"))
     elseif cmd == "boss" then
         -- Dev probe: find a boss by name in the Adventure Guide's data, browsing every tier, dungeon and raid
         local want = rest ~= "" and rest:lower() or "rath'mael"
-        print(("BlatoJournal boss search: %s"):format(want))
+        print(("BlatoLexicon boss search: %s"):format(want))
         if not (EJ_GetNumTiers and EJ_SelectTier and EJ_GetInstanceByIndex and EJ_GetEncounterInfoByIndex) then
             print("  the Adventure Guide API is missing"); return
         end
@@ -344,7 +344,7 @@ SlashCmdList.BLATOJOURNAL = function(msg)
             local txt = not ok and ("error: " .. tostring(v)) or (issecretvalue and issecretvalue(v)) and "|cffff6060secret|r" or tostring(v)
             print(("  %s: %s"):format(label, txt))
         end
-        print("BlatoJournal target:")
+        print("BlatoLexicon target:")
         show("name", pcall(UnitName, "target"))
         show("type", pcall(UnitCreatureType, "target"))
         show("family", pcall(UnitCreatureFamily, "target"))
@@ -374,14 +374,14 @@ SlashCmdList.BLATOJOURNAL = function(msg)
         UI.Show("notes"); UI.content:Hide()
         local function Style(st, n, nxt)
             DB.style = st; UI.ApplyStyle(); UI.content:Hide()
-            print("BlatoJournal blank " .. n .. ": " .. st)
+            print("BlatoLexicon blank " .. n .. ": " .. st)
             C_Timer.After(5, nxt)
         end
         Style("moderndark", 1, function() Style("modernparchment", 2, function()
-            DB.style = keep; UI.ApplyStyle(); UI.content:Show(); print("BlatoJournal blank: done") end) end)
+            DB.style = keep; UI.ApplyStyle(); UI.content:Show(); print("BlatoLexicon blank: done") end) end)
     else UI.Toggle() end
 end
-SLASH_BLATOJOURNALNOTE1 = "/note"
-SlashCmdList.BLATOJOURNALNOTE = function(msg)
+SLASH_BLATOLEXICONNOTE1 = "/note"
+SlashCmdList.BLATOLEXICONNOTE = function(msg)
     if msg:match("%S") then if J.AddNote(msg) then J.Moment("|cffb0b0b0Noted.|r", "note") end else UI.NoteDialog() end
 end
