@@ -87,6 +87,8 @@ function OMQ:Print(msg)
 end
 
 function OMQ:Error(where, err)
+    -- in the log that survives a reload (ErrorLog.lua), first: the lines below can fail on a secret value
+    if ns.ErrorLog then ns.ErrorLog.Add("party", where, err) end
     -- Never spam; keep the last errors for /blato debug
     self.errors = self.errors or {}
     table.insert(self.errors, tostring(where) .. ": " .. tostring(err))
@@ -185,7 +187,29 @@ OMQ:RegisterCommand("debug", function()
     print("  addon users known: " .. n)
     print("  errors: " .. #(OMQ.errors or {}))
     for _, e in ipairs(OMQ.errors or {}) do print("   " .. e) end
+    print("  saved errors: " .. #ns.ErrorLog.List() .. " (/blato errors)")
 end, "show internal state")
+
+-- Blato Lexicon: the log of ErrorLog.lua
+OMQ:RegisterCommand("errors", function(arg)
+    local Log = ns.ErrorLog
+    arg = (arg or ""):lower()
+    if arg == "clear" then
+        Log.Clear()
+        OMQ:Print("the error log is empty now")
+    elseif arg == "test" then
+        OMQ:Print("a test error follows, nothing is wrong. /blato errors should list it then.")
+        C_Timer.After(0, function() error("BlatoLexicon: a test of the error log, nothing is wrong") end)
+    else
+        local list = Log.List()
+        OMQ:Print(#list .. " errors saved on this computer" .. (#list > 0 and ", the last ones:" or "."))
+        for i = #list, math.max(1, #list - 4), -1 do
+            local e = list[i]
+            local tag = e.where and (e.kind .. " " .. e.where) or e.kind
+            print(string.format("  %s x%d [%s] %s", e.last or "?", e.count or 1, tag, e.message))
+        end
+    end
+end, "errors saved on this computer: the last five | clear | test")
 
 OMQ:RegisterCommand("sleep", function() OMQ:Fire("SLASH_EMPTY") end, "One more quest? or Bed time: start the group vote")
 

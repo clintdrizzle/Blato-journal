@@ -89,6 +89,6 @@ ns.BlatoPage = {
         { "Sounds", I .. "INV_Misc_Note_01", "Soft sounds of the game for cards and bets.", toggle = Option("sound", false) },
         { "Commands in chat", I .. "INV_Misc_QuestionMark", "Every /blato command with a line about it.",
           hint = "/blato help", click = function() if SlashCmdList.BLATOPARTY then SlashCmdList.BLATOPARTY("help") end end },
-        { "Errors", I .. "INV_Misc_Bone_HumanSkull_01", "Version and the last errors, for bug reports.", cmd = "debug" },
+        { "Errors", I .. "INV_Misc_Bone_HumanSkull_01", "The last errors saved on this computer, for bug reports. Nothing is sent anywhere.", cmd = "errors" },
     } },
 }

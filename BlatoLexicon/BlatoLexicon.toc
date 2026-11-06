@@ -4,11 +4,14 @@
 ## Author: Bláto party (based on ForeverJournal by Ugge Zen and One More Quest by MadDadVibe)
 ## IconTexture: Interface/Icons/Spell_Nature_EarthElemental_Totem
 ## X-License: GPL-3.0
-## Version: 0.3.0
+## Version: 0.3.1
 ## OptionalDeps: !ForeverData, !ForeverDataProtect
-## SavedVariables: BJ_DB, BJ_Chars, BlatoPartyDB
+## SavedVariables: BJ_DB, BJ_Chars, BlatoPartyDB, BlatoLexiconErrors
 ## SavedVariablesPerCharacter: BJ_DBC, BJ_Char
 ## AddonCompartmentFunc: BlatoLexicon_Toggle
+
+# first, so that it also sees errors while the other files load
+ErrorLog.lua
 
 # the journal (from ForeverJournal)
 Journal\Kit.lua

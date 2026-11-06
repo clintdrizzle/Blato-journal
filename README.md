@@ -34,7 +34,12 @@ Upgrading from version 0.1.x, when this addon was still called Bláto Journal: d
 - `/blato` opens the Commands tab
 - `/blato sleep` starts the "One more quest?" / "Bed time" vote
 - `/blato help` lists every party command
+- `/blato errors` shows the last errors of the addon (`clear` empties the list, `test` makes a harmless one to try it)
 - `/bl` or `/lexicon` opens the lexicon, `/note` writes a quick note
+
+## Reporting a bug
+
+Lua errors of this addon are saved on your computer, and blocked actions of any addon too: `BlatoLexiconErrors` in `WTF/Account/<account>/SavedVariables/BlatoLexicon.lua`, written when you log out or type `/reload`. Nothing is sent anywhere. That file also holds your journal, so send only that part with a bug report.
 
 ## Where it comes from
 
@@ -54,7 +59,8 @@ Changes from the originals:
 - left out from One More Quest: automatic quest accepting and turn-in, Shift-click heals, the Dad UI, the chat filter, the guided tour, selling grey items, the group quest tracker, the arrows to places and quests, the meeting point, and the dungeon tools (Group Check, Progress Check, threat meter, dungeon quests and loot);
 - the arrow also shows the friends left behind who ran off from the group, not only the one who fell behind (`A:Evaluate` in `Party/Arrow.lua`);
 - renamed globals, saved variables and commands (`/blato`, `/bl`), so Blato Lexicon can be installed next to the originals;
-- the simulator (`/blato sim`) starts with 2 party mates and never sends real mail.
+- the simulator (`/blato sim`) starts with 2 party mates and never sends real mail;
+- a log of errors that survives a reload (`BlatoLexicon/ErrorLog.lua`).
 
 ## License
 
