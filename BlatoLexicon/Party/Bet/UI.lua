@@ -421,10 +421,8 @@ function UI:RefreshStrip()
     if not strip then return end
     local list = B():Running()
     if #list == 0 then strip:Hide(); return end
-    local cb = _G.BlatoPartyCheckBar
     strip:ClearAllPoints()
-    if cb then strip:SetPoint("BOTTOMLEFT", cb, "TOPLEFT", 0, 2)
-    else strip:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 160) end
+    strip:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 160)
     for i, line in ipairs(strip.lines) do
         local b = list[i]
         if b then

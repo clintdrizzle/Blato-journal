@@ -247,8 +247,7 @@ function V:Start()
     local me = OMQ:GetSelf()
     if not me then return end
     if not OMQ:GetChannel() then
-        -- alone there is nobody to ask: one more quest at once (decision 302)
-        if OMQ.NextQuest then OMQ.NextQuest.Press() else OMQ:Print("The vote needs a group.") end
+        OMQ:Print("The vote needs a group.")
         return
     end
     if vote then

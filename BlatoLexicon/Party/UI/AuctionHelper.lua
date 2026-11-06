@@ -155,7 +155,7 @@ function AH.Scan()
                 local loc = location(bag, slot)
                 local _, _, _, equipLoc, icon, classID = instant(it.itemID)
                 -- every white or better item (decision 260); not quest items, ammo, drinks and class supplies
-                local keep = OMQ.Ready and OMQ.Ready.KEEP and OMQ.Ready.KEEP[it.itemID]
+                local keep = OMQ.Supplies and OMQ.Supplies.KEEP and OMQ.Supplies.KEEP[it.itemID]
                 local valid = A.IsSellItemValid and A.IsSellItemValid(loc, false)
                 if classID ~= 12 and classID ~= 6 and not keep and not AH.IsTool(it.itemID) and valid ~= false then
                     local link = it.hyperlink

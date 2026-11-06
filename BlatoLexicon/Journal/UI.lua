@@ -598,7 +598,6 @@ end
 -- Icons by purpose. Each is a list tried in order: atlases from the newer UI, then a classic icon file.
 local ICONSET = {
     commands = { "Interface/Icons/Spell_Nature_EarthElemental_Totem" },   -- Blato Lexicon: mud
-    dungeons = { "UI-HUD-MicroMenu-Groupfinder-Up", "Interface/Icons/INV_Misc_Key_03" },
     journey = { "UI-HUD-MicroMenu-SpellbookAbilities-Up", "Interface/Icons/INV_Misc_Book_09" },
     places = { "Waypoint-MapPin-Tracked", "UI-HUD-MicroMenu-Collections-Up", "Interface/Icons/INV_Misc_Map_01" },
     goals = { "UI-HUD-MicroMenu-Achievements-Up", "Interface/Icons/Ability_Tracking" },
@@ -1047,9 +1046,9 @@ local function ArchiveLink(kind, top)
 end
 
 -- Tabs -------------------------------------------------------------------------------------
--- Blato Lexicon: Commands (the party's buttons) first, the page the journal opens on, then the Dungeon Journal.
+-- Blato Lexicon: Commands (the party's buttons) first, the page the journal opens on. No Dungeons tab.
 -- No Goals and no Fellowship page (the fellowship is still counted: the Journey and the Quests pages use it).
-local TABS = { { "commands", "Commands" }, { "dungeons", "Dungeons" }, { "journey", "Journey" }, { "places", "Places" },
+local TABS = { { "commands", "Commands" }, { "journey", "Journey" }, { "places", "Places" },
     { "quests", "Quests" }, { "notes", "Notes" } }
 local current = "commands"
 -- Icon tabs down the right edge, like the professions and group finder windows.
@@ -2953,82 +2952,8 @@ function BJ.RenderCommands()
     end
 end
 
--- Dungeons ------------------------------------------------------------------------------------
--- Blato Lexicon: the Dungeons tab is "Dungeon Journal" by Exehn (CurseForge), installed as its own addon: its
--- code is not ours to ship. While the tab is open its window sits exactly over the journal window, which takes its
--- size, so the journal's tabs hang under it; dragging it drags the journal, closing it closes the journal. Any
--- other tab, or closing the journal, puts it back where it was.
-BJ.dock = { on = false }
-function BJ.DungeonFrame()
-    local f = _G.ForeverDungeonJournalFrame
-    return type(f) == "table" and f.SetPoint and f or nil
-end
-function BJ.FitDock()
-    local f = BJ.DungeonFrame()
-    if not (BJ.dock.on and f) then return end
-    local s = f:GetEffectiveScale() / win:GetEffectiveScale()
-    win:SetSize(f:GetWidth() * s, f:GetHeight() * s)
-end
-function UI.Undock()
-    if not BJ.dock.on then return end
-    BJ.dock.on = false
-    local f = BJ.DungeonFrame()
-    if f then
-        BJ.dock.leaving = true
-        f:Hide()
-        BJ.dock.leaving = false
-        BJ.RestorePoints(f, BJ.dock.points)
-        f:SetScript("OnDragStart", BJ.dock.dragStart)
-        f:SetScript("OnDragStop", BJ.dock.dragStop)
-    end
-    win:SetSize(W, HGT)
-    scroll:Show()
-end
-function BJ.Dock()
-    local f = BJ.DungeonFrame()
-    if not f then return false end
-    if BJ.dock.on then BJ.FitDock(); f:Show(); return true end
-    BJ.dock.on = true
-    BJ.dock.points = BJ.SavePoints(f)
-    BJ.dock.dragStart, BJ.dock.dragStop = f:GetScript("OnDragStart"), f:GetScript("OnDragStop")
-    f:SetScript("OnDragStart", function() win:StartMoving() end)
-    f:SetScript("OnDragStop", function() win:StopMovingOrSizing() end)
-    if not BJ.dock.hooked then
-        BJ.dock.hooked = true
-        hooksecurefunc(f, "SetScale", BJ.FitDock)   -- its resize grip scales it: the journal follows
-        f:HookScript("OnHide", function() if BJ.dock.on and not BJ.dock.leaving and win:IsShown() then win:Hide() end end)
-    end
-    f:ClearAllPoints()
-    f:SetPoint("TOPLEFT", win, "TOPLEFT", 0, 0)
-    BJ.FitDock()
-    scroll:Hide()
-    f:Show()
-    return true
-end
-win:HookScript("OnHide", function() UI.Undock() end)
-
-function BJ.RenderDungeons()
-    BarButtons({})
-    if BJ.Dock() then return end
-    PageHead("Dungeons", "Bosses, loot, quests and maps of every dungeon, from the addon Dungeon Journal.")
-    Text("Dungeon Journal is not installed. Get \"Dungeon Journal\" by Exehn, the edition for WoW Forever, from CurseForge, "
-        .. "unzip it into Interface/AddOns and /reload: this tab then shows it.", "body")
-    Gap(10)
-    local list = {}
-    for name, d in pairs(H.dungeons) do list[#list + 1] = { name, d } end
-    table.sort(list, function(a, b) return (a[2].first or 0) < (b[2].first or 0) end)
-    if Header("dungeons:mine", "Your dungeons", #list > 0 and tostring(#list) or nil) then
-        if #list == 0 then Text("None braved yet.", "ink") end
-        for _, it in ipairs(list) do
-            local top = y
-            local line = Text(("%s  ·  %s, first %s"):format(it[1], J.Count(it[2].runs or 0, "run"), J.Date(it[2].first)), "body")
-            Hotspot(0, top + 2, CW, line:GetStringHeight() + 4, function() UI.OpenPlace("dungeon:" .. it[1]) end, "Open " .. it[1])
-        end
-    end
-end
-
 -- Blato Lexicon: no Goals and no Fellowship page (their code above stays unused)
-local RENDER = { commands = BJ.RenderCommands, dungeons = BJ.RenderDungeons, journey = RenderJourney, places = RenderPlaces,
+local RENDER = { commands = BJ.RenderCommands, journey = RenderJourney, places = RenderPlaces,
     quests = RenderQuests, notes = RenderNotes }
 
 -- Rebuilding the page hides and re-shows its edit boxes, and hiding one drops keyboard focus.
@@ -3061,7 +2986,6 @@ end)
 function UI.Render()
     if not win:IsShown() then return end
     SelectTab()   -- the tabs follow the style too (classic or modern)
-    if current ~= "dungeons" then UI.Undock() end
     back:SetShown(BackTarget() ~= nil)
     pendingRender = false
     local focused = FocusedBox()

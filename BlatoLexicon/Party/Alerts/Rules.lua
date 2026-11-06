@@ -307,7 +307,7 @@ M:Register({
                 key = "trainup:" .. even,
                 text = "Level " .. even .. ": new at your class trainer",
                 title = "Level " .. even .. ": new at your class trainer", sub = txt or "New skills to learn",
-                tipLines = tip, go = "trainer", tag = "LEVEL UP",
+                tipLines = tip, tag = "LEVEL UP",
                 icon = "Interface\\Icons\\INV_Misc_Book_09", color = GREEN,
             } }
         end
@@ -324,7 +324,6 @@ M:Register({
             text = "Level " .. even .. ": train new skills",
             title = "Level " .. even .. ": train new skills", sub = txt or where,
             tipLines = tip and (function() local t = { tip[1], where }; for i = 2, #tip do t[#t + 1] = tip[i] end; return t end)(),
-            go = "trainer",
             icon = "Interface\\Icons\\INV_Misc_Book_09", color = GREEN,
         } }
     end,
@@ -365,7 +364,7 @@ M:Register({
     id = "drinks", name = "Out of Drinks",
     check = function()
         if InCombatLockdown() then return "keep" end
-        local n = OMQ.Ready and OMQ.Ready.Drinks and OMQ.Ready.Drinks()
+        local n = OMQ.Supplies and OMQ.Supplies.Drinks and OMQ.Supplies.Drinks()
         if not n or n >= LOW_DRINKS then return nil end
         local _, class = UnitClass("player")
         if class == "MAGE" then return conjureCard(n) end          -- anywhere, never "buy drinks" (decision 280)
@@ -380,7 +379,7 @@ M:Register({
         end
         return { {
             key = "drinks", text = "Buy drinks: " .. sub, title = "Buy drinks", sub = sub, tag = "DRINKS",
-            go = "inn", icon = "Interface\\Icons\\INV_Drink_07", color = { 0.35, 0.65, 0.91 },
+            icon = "Interface\\Icons\\INV_Drink_07", color = { 0.35, 0.65, 0.91 },
         } }
     end,
 })
@@ -428,7 +427,7 @@ M:Register({
         drinkName = drinkName or spellName(430)
         local names = auraNames("player")
         if names and drinkName and names[drinkName] then return nil end     -- already drinking
-        local best = OMQ.Ready and OMQ.Ready.BestDrink and OMQ.Ready.BestDrink()
+        local best = OMQ.Supplies and OMQ.Supplies.BestDrink and OMQ.Supplies.BestDrink()
         return { {
             key = "drink", text = string.format("Drink: mana at %d%%", math.floor(pct)),
             icon = "Interface\\Icons\\INV_Drink_07", color = BLUE,
@@ -456,10 +455,10 @@ M:Register({
                 key = "repair",
                 text = string.format("Repair: most damaged item at %d%%", math.floor(lowest)),
                 icon = GetInventoryItemTexture("player", slot) or "Interface\\Icons\\Trade_BlackSmithing",
-                color = ORANGE, go = "repair",
+                color = ORANGE,
             } }
         end
-        -- leaving a major city below 60 percent (decision 239): one card, with the arrow back.
+        -- leaving a major city below 60 percent (decision 239): one card.
         -- Before a flight too (decision 306): near a flight master in a major city, or the flight map open.
         local leaving = M.leftCityAt and GetTime() - M.leftCityAt < M.LEAVE_CARD_SECONDS
         local flying = M.flightAt and GetTime() - M.flightAt < M.FLIGHT_CARD_SECONDS
@@ -472,7 +471,7 @@ M:Register({
                     d and string.format(" - %s is %d yards back", name or "a repair vendor", math.floor(d)) or ""),
                 text = flying and not leaving and "Repair before you fly" or "Repair before you go",
                 icon = GetInventoryItemTexture("player", slot) or "Interface\\Icons\\Trade_BlackSmithing",
-                color = ORANGE, go = "repair",
+                color = ORANGE,
             } }
         end
     end,
@@ -781,7 +780,6 @@ M:Register({
                         key = "prof:" .. l.name .. ":" .. step.cap,
                         text = l.name .. ": train " .. step.rank,
                         icon = "Interface\\Icons\\INV_Misc_Gear_01", color = TEAL,
-                        go = l.key and ("proftrainer:" .. l.key) or nil,
                     }
                 end
             end
@@ -872,7 +870,6 @@ M:Register({
                         key = "tool:" .. tool.item,
                         text = "Buy " .. toolName(tool) .. " (" .. (l.name or l.key) .. ")",
                         icon = toolIcon(tool), color = ORANGE,
-                        go = "tool:" .. tool.item,                 -- click: arrow to the nearest seller
                     }
                 end
             end
@@ -1352,7 +1349,6 @@ M:Register({
 -- /blato diag: raw answers of the APIs behind the alerts, for bug reports
 ----------------------------------------------------------------------
 OMQ:RegisterCommand("diag", function(arg)
-    if arg == "guide" and OMQ.GuideProbe then return OMQ.GuideProbe() end
     local out = {}
     local function add(t) out[#out + 1] = t end
     local function show(v) if isSecret(v) then return "SECRET" end return tostring(v) end

@@ -166,7 +166,7 @@ function V.Reason(it, extra, ctx)
         if best and need < best then return "old", "old " .. kind .. " - you carry better" end
         return nil
     end
-    if OMQ.Ready and OMQ.Ready.KEEP and OMQ.Ready.KEEP[id] then return nil end
+    if OMQ.Supplies and OMQ.Supplies.KEEP and OMQ.Supplies.KEEP[id] then return nil end
     local B = OMQ.AuctionBuy
     if B and B.TargetFor and B.TargetFor(id) then return nil end             -- my consumables
     if B and OMQ.BuyKind and OMQ.BuyKind(id) then return nil end
@@ -457,7 +457,7 @@ ev:SetScript("OnEvent", function(_, event)
     local ok, err = pcall(function()
         if event == "MERCHANT_SHOW" then
             V.atMerchant = true
-            -- after "sell grey items" (QoL.lua) had its turn
+            -- after the repair and the purchases (QoL.lua) had their turn
             if C_Timer and C_Timer.After then C_Timer.After(0.6, function() if V.atMerchant then V.Open() end end)
             else V.Open() end
         elseif event == "MERCHANT_CLOSED" then V.atMerchant = false; V.Close()

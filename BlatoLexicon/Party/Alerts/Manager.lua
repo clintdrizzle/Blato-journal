@@ -94,7 +94,7 @@ function M:Evaluate()
                                 active[a.key] = a
                             else
                                 cur.text, cur.icon, cur.color = a.text, a.icon or cur.icon, a.color or cur.color
-                                cur.cast, cur.unit, cur.go, cur.open = a.cast, a.unit, a.go, a.open
+                                cur.cast, cur.unit, cur.open = a.cast, a.unit, a.open
                                 cur.useItem, cur.weapon = a.useItem, a.weapon
                                 cur.tipLines = a.tipLines
                                 cur.title, cur.sub, cur.tag = a.title, a.sub, a.tag
@@ -521,13 +521,7 @@ local function makeCard(i)
                 return
             end
         end
-        local go = self.go
         if self.key then M:Dismiss(self.key, false) end
-        -- a left click starts the arrow, unless another arrow is already active
-        if go and OMQ.Guide and not OMQ.Guide:IsActive()
-            and not (OMQ.Arrow and OMQ.Arrow.IsStragglerShown and OMQ.Arrow:IsStragglerShown()) then
-            OMQ.Guide:Start(go)
-        end
     end)
     card:Hide()
     return card
@@ -589,7 +583,6 @@ function M:Render()
             now[a.key] = i
             if card.key ~= a.key then card.wShow = false end
             card.key = a.key
-            card.go = a.go or false
             card.cast = a.cast or false
             card.useItem = (not a.weapon) and a.useItem or false
             card.weapon = a.weapon and a.useItem or false
@@ -624,7 +617,6 @@ function M:Render()
             slotKey[i] = a.key
         else
             card.key = nil
-            card.go = false
             card.cast = false
             card.open = false
             card.weapon, card.wShow = false, false

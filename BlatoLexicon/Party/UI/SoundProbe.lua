@@ -34,8 +34,8 @@ SP.LIST = {
 }
 SP.GROUPS = {
     ["in"] = "a new alert card or popup",
-    update = "quest tracker progress, a bet value",
-    done = "stamp, milestone reached, bet won",
+    update = "a bet value",
+    done = "bet won",
     announce = "bet starts now, vote",
 }
 

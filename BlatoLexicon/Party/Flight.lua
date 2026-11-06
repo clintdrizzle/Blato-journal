@@ -72,14 +72,14 @@ OMQ:RegisterMessage("F", function(f)
     if UnitOnTaxi and UnitOnTaxi("player") then return end
     pending = { dest = dest, who = (who and who ~= "") and who or "?", guid = guid, at = GetTime(),
                 x = tonumber(f[4]), y = tonumber(f[5]) }
-    OMQ:Print(string.format("%s flies to %s - open a flight master within %d seconds to follow automatically (the card gives you 5 minutes and the arrow)",
+    OMQ:Print(string.format("%s flies to %s - open a flight master within %d seconds to follow automatically (a click on the card gives you 5 minutes)",
         pending.who, dest, FOLLOW_SECONDS))
     OMQ:Fire("FLIGHT_PENDING")
     if OMQ.Alerts then OMQ.Alerts:Evaluate() end
 end)
 
--- decision 242: a dad who is not at a flight master gets a card; a click leads the arrow to the
--- nearest flight master and keeps the follow open for 5 minutes, so he can still get there
+-- decision 242: a friend who is not at a flight master gets a card; a click keeps the follow open
+-- for 5 minutes, so there is still time to get to one
 F.LONG_WINDOW = 300
 function F:Extend()
     if pending then pending.window = math.max(pending.window or FOLLOW_SECONDS, (GetTime() - pending.at) + F.LONG_WINDOW) end
@@ -92,8 +92,8 @@ if OMQ.Alerts then
         return { {
             key = "flight:" .. (p.guid or "") .. ":" .. math.floor(p.at),
             title = p.who .. " flies to " .. p.dest, tag = "FLIGHT",
-            sub = "Click: arrow to the nearest flight master - you follow him there",
-            text = p.who .. " flies to " .. p.dest, go = "flight",
+            sub = "Click: 5 minutes to reach a flight master and follow",
+            text = p.who .. " flies to " .. p.dest,
             icon = "Interface\\Icons\\Ability_Mount_Gryphon_01", color = { 0.89, 0.71, 0.29 },
             open = function() F:Extend() end,
         } }

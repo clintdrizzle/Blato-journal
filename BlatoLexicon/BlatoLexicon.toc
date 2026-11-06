@@ -4,8 +4,8 @@
 ## Author: Bláto party (based on ForeverJournal by Ugge Zen and One More Quest by MadDadVibe)
 ## IconTexture: Interface/Icons/Spell_Nature_EarthElemental_Totem
 ## X-License: GPL-3.0
-## Version: 0.2.0
-## OptionalDeps: !ForeverData, !ForeverDataProtect, ForeverDungeonJournal
+## Version: 0.3.0
+## OptionalDeps: !ForeverData, !ForeverDataProtect
 ## SavedVariables: BJ_DB, BJ_Chars, BlatoPartyDB
 ## SavedVariablesPerCharacter: BJ_DBC, BJ_Char
 ## AddonCompartmentFunc: BlatoLexicon_Toggle
@@ -41,37 +41,26 @@ Party\UI\LifetimeWindow.lua
 Party\Arrow.lua
 Party\Guide\Places.lua
 Party\Guide\Guide.lua
-Party\Guide\Bar.lua
-Party\Data\DungeonQuests.lua
-Party\Data\DungeonGuide.lua
 Party\Data\ForeverPlaces.lua
-Party\Data\DungeonLoot.lua
-Party\Data\QuestRewards.lua
 Party\Data\QuestPlaces.lua
-Party\Data\QuestZones.lua
-Party\Data\ForeverDungeons.lua
-Party\Data\Milestones.lua
 Party\Data\SkillThresholds.lua
 Party\Data\TrainerSpells.lua
 Party\Data\BuyList.lua
-Party\UI\Ready.lua
+Party\Supplies.lua
 Party\UI\AuctionHelper.lua
 Party\UI\AuctionBuy.lua
 Party\UI\CraftPrices.lua
 Party\UI\CraftProfit.lua
 Party\UI\Vendor.lua
-Party\UI\CheckBar.lua
-Party\Guide\Probe.lua
 Party\Alerts\Manager.lua
 Party\Alerts\Rules.lua
 Party\Alerts\ManaCard.lua
 Party\Alerts\RageCard.lua
 Party\Alerts\GroupDrink.lua
 Party\Alerts\Pets.lua
-Party\Alerts\DungeonQuests.lua
 Party\Alerts\Consumables.lua
 Party\QuestSync.lua
-Party\NextQuest.lua
+Party\QuestFilter.lua
 Party\UI\Options.lua
 Party\Vote.lua
 Party\Titles.lua
@@ -87,10 +76,6 @@ Party\Follow.lua
 Party\Settings.lua
 Party\UI\OptionsFull.lua
 Party\UI\Features.lua
-Party\UI\Tracker.lua
-Party\QuestTracker\Probe.lua
-Party\QuestTracker\Tracker.lua
-Party\UI\QuestTracker.lua
 Party\Mail\Probe.lua
 Party\Bet\Bets.lua
 Party\Bet\Mail.lua
@@ -98,9 +83,6 @@ Party\Bet\UI.lua
 Party\Sim\Sim.lua
 Party\UI\LayoutProbe.lua
 Party\UI\SoundProbe.lua
-Party\UI\ThreatProbe.lua
-Party\UI\ThreatMeter.lua
-Party\UI\Milestones.lua
 Party\UI\Minimap.lua
 Party\Main.lua
 

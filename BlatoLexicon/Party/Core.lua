@@ -32,15 +32,14 @@ local DEFAULTS = {
         buffOnlyAddon = false,
         compare = true,
         needs = true,
-        qtrack = true,               -- group quest tracker (decision 149)
         sound = false,               -- soft sounds, off by default (decision 185)
         master = { alerts = true, group = true, guidance = true, vendor = true, chat = true },
         chatWords = "",
-        qol = { repair = true, junk = true, water = true, ammo = true, flight = true, openmail = true, closemail = false },
+        qol = { repair = true, water = true, ammo = true, flight = true, openmail = true, closemail = false },
     },
     alerts = { enabled = {}, lenientRank = false },
     arrow = { threshold = 120, enabled = true, style = 1 },     -- style: decision 192
-    guide = { bar = true, receive = true, share = true, sharePlaces = true },
+    guide = { sharePlaces = true },   -- learned places feed the alert cards (Guide/Places.lua)
     quests = { ignored = {}, titles = {} },
 }
 

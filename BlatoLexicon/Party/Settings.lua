@@ -85,9 +85,6 @@ function S:MasterSet(id, v)
     OMQ.db.options.master = OMQ.db.options.master or {}
     OMQ.db.options.master[id] = v and true or false
     if id == "alerts" and OMQ.Alerts then OMQ.Alerts:Evaluate()
-    elseif id == "guidance" then
-        if not v and OMQ.Guide then OMQ.Guide:Clear() end
-        if OMQ.GuideBar then OMQ.GuideBar:Refresh() end
     end
 end
 
@@ -136,37 +133,6 @@ function S:Sections()
               tip = "Tooltip line on green or better materials a group member needs for a recipe.",
               get = function() return OMQ.db.options.needs ~= false end,
               set = function(v) OMQ.db.options.needs = v and true or false end },
-            { type = "check", label = "Show Quest Tracker",
-              tip = "Shows the quest progress of every friend when anyone in the group makes progress. Hides 60 seconds after the last progress; right click closes it. Your own progress is always sent to the others.",
-              get = function() return OMQ.db.options.qtrack ~= false end,
-              set = function(v) OMQ.db.options.qtrack = v and true or false end },
-            -- decision 209: three-way toggle for the tracker background
-            { type = "segment", indent = true, label = "Tracker background",
-              tip = "None: only the text, with a shadow. Light: a see-through card. Full: the dark card.",
-              options = { "None", "Light", "Full" },
-              get = function()
-                  local f = OMQ.QTrackFrame
-                  local cur = f and f:Background() or "none"
-                  for i, b in ipairs(f and f.BACKGROUNDS or { "none" }) do if b == cur then return i end end
-                  return 1
-              end,
-              set = function(i)
-                  local f = OMQ.QTrackFrame
-                  if f and f.BACKGROUNDS[i] then f:SetBackground(f.BACKGROUNDS[i]) end
-              end },
-            -- decisions 334, 335: the threat meter
-            { type = "segment", label = "Threat meter",
-              tip = "A small frame with the threat of everyone in your group on your target, in percent (100 = he is the target). In group: whenever you are in a group. Dungeons: only inside a dungeon or raid. Place it in the move mode; /blato threat reset puts it back.",
-              options = { "In group", "Dungeons", "Never" },
-              get = function()
-                  local m = OMQ.ThreatMeter and OMQ.ThreatMeter.Mode() or "group"
-                  return (m == "group" and 1) or (m == "dungeon" and 2) or 3
-              end,
-              set = function(i)
-                  OMQ.db.options.threatMode = ({ "group", "dungeon", "never" })[i] or "group"
-                  OMQ.db.options.threat = nil
-                  if OMQ.ThreatMeter then OMQ.ThreatMeter.Refresh() end
-              end },
             { type = "check", label = "Follow group members on flights",
               tip = "If a member flies somewhere, your flight master picks the same destination.",
               get = qolGet("flight"), set = qolSet("flight") },
@@ -192,29 +158,16 @@ function S:Sections()
               end },
         } },
         { title = "GUIDANCE", master = "guidance", col = 2, items = {
-            { type = "check", label = "Arrow to far away group members",
+            { type = "check", label = "Arrow to a friend who ran off",
+              tip = "An arrow points to a friend who is far from all of you. If you are the one who ran off, it points back to the nearest friend.",
               get = function() return OMQ.db.arrow.enabled ~= false end,
               set = function(v) OMQ.db.arrow.enabled = v and true or false end },
             { type = "step", label = "Arrow appears beyond", unit = "yd", min = 20, max = 500, by = 10,
               get = function() return OMQ.db.arrow.threshold or 120 end,
               set = function(v) OMQ.Arrow:SetThreshold(v) end },
-            { type = "check", label = "Show the icon bar",
-              get = function() return OMQ.db.guide.bar end,
-              set = function(v) OMQ.GuideBar:SetShown(v) end },
-            { type = "check", label = "Follow pin and meeting point of the group",
-              get = function() return OMQ.db.guide.receive ~= false end,
-              set = function(v) OMQ.db.guide.receive = v and true or false end },
-            { type = "check", label = "Share learned places with the group",
-              tip = "Vendors, trainers, mailboxes and other places you have used are sent to group members with the addon, and theirs are added to your arrow targets.",
-              get = function() return OMQ.db.guide.sharePlaces ~= false end,
-              set = function(v) OMQ.db.guide.sharePlaces = v and true or false end },
-            { type = "check", label = "Send Location Marker",
-              tip = "Your map pin is sent to group members with the addon. Switched off, your pin is not sent and nobody's navigation gets it (useful with pin addons such as TomTom or Azimuth). The meeting point is still sent when you set it.",
-              get = function() return OMQ.db.guide.share ~= false end,
-              set = function(v) OMQ.db.guide.share = v and true or false end },
             { type = "button",
               label = function()
-                  return OMQ.Arrow:IsMoveMode() and "Move mode ON - click to lock" or "Move arrow, alerts, bars, lists, tracker"
+                  return OMQ.Arrow:IsMoveMode() and "Move mode ON - click to lock" or "Move arrow and alert cards"
               end,
               click = function() OMQ.Arrow:ToggleMoveMode() end },
             { type = "choice", label = "Arrow style",
@@ -227,8 +180,6 @@ function S:Sections()
         } },
         { title = "AUTOMATIONS", master = "vendor", col = 2, items = {
             { type = "check", label = "Repair gear automatically", get = qolGet("repair"), set = qolSet("repair") },
-            { type = "check", label = "Sell grey items automatically", get = qolGet("junk"), set = qolSet("junk"),
-              tip = "Also sells what the auction helper found not worth the auction house (under +5%), unless it can be worn." },
             -- decision 259
             { type = "check", label = "Auction helper at the auction house",
               tip = "Lists what in your bags brings at least 5% more on the auction house than at the vendor and posts it with one click per auction. Fast mode: one button. Select mode: one row per item. Buy: weapon upgrades and the buff items of your class, stock up with one click per item.",
@@ -265,18 +216,14 @@ function S:Sections()
               get = function() return not OMQ.db.minimap.hidden end,
               set = function(v) OMQ.Minimap:SetHidden(not v) end },
             { type = "check", label = "Sounds",
-              tip = "Soft sounds of the game when something changes: a new alert card or popup, quest tracker progress, a stamp, a milestone or a won bet, and when a bet or vote starts. They follow your effects volume.",
+              tip = "Soft sounds of the game when something changes: a new alert card or popup or a won bet, and when a bet or vote starts. They follow your effects volume.",
               get = function() return OMQ.db.options.sound == true end,
               set = function(v) OMQ.db.options.sound = v and true or false end },
-            { type = "check", label = "Hide Objective Tracker",
-              tip = "Hides the quest tracker on the screen. The game shows it again after login, reload and quest changes; the addon hides it each time. Switch off to see it again.",
-              get = function() return OMQ.Tracker:Wanted() end,
-              set = function(v) OMQ.Tracker:SetHidden(v) end },
             { type = "button", label = "Open lifetime statistics", closeOptions = true,
               click = function() OMQ:Fire("MINIMAP_LEFT_CLICK") end },
             { type = "button", label = "Reset all positions", done = "Positions reset",
               click = function()
-                  OMQ:RunCommand("arrow", "reset"); OMQ:RunCommand("bar", "reset"); OMQ:RunCommand("alerts", "position"); OMQ:RunCommand("qtrack", "position")
+                  OMQ:RunCommand("arrow", "reset"); OMQ:RunCommand("alerts", "position")
               end },
         } },
     }

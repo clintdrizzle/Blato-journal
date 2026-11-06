@@ -1,6 +1,6 @@
 -- One More Quest: places of the new WoW Forever content that the Questie data does not have (decision 253).
 -- Class trainers: warcrafttavern.com class trainer lists (Zephras Isle, Tirisfal paladins, Dun Morogh shamans).
--- The entrances of the new dungeons are in Data/ForeverDungeons.lua (decision 254).
+-- The entrances of the new dungeons are not part of this list any more.
 -- Format as in Data/Places.lua: {kind, class, uiMapID, x%, y%, faction ("A","H","AH"), name, highest level taught}
 -- The 8th field is optional: the Thendal Village trainers only teach up to level 6, so the arrow skips them later.
 -- Not here because no source has coordinates yet: Zephras Isle vendors, innkeepers, profession trainers and the

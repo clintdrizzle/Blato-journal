@@ -1,10 +1,9 @@
 -- One More Quest: quality of life at vendors
 -- When a merchant window opens:
 --   1. repair everything (if the merchant can repair)
---   2. sell all grey items
---   3. mana classes from level 10 (not mages: they conjure it): buy the best water this merchant offers, up to 20 pieces
---   4. hunters: fill the free room of the quiver / ammo pouch with arrows (bow, crossbow) or bullets (gun)
--- Each part can be switched with /blato qol repair|junk|water|ammo.
+--   2. mana classes from level 10 (not mages: they conjure it): buy the best water this merchant offers, up to 20 pieces
+--   3. hunters: fill the free room of the quiver / ammo pouch with arrows (bow, crossbow) or bullets (gun)
+-- Each part can be switched with /blato qol repair|water|ammo.
 local ADDON, OMQ = ...
 OMQ = _G.BlatoParty
 
@@ -43,14 +42,6 @@ local function itemCount(id)
     return 0
 end
 
-local function sellPrice(link)
-    if C_Item and C_Item.GetItemInfo then
-        local _, _, _, _, _, _, _, _, _, _, price = C_Item.GetItemInfo(link)
-        return price
-    end
-    if GetItemInfo then return select(11, GetItemInfo(link)) end
-end
-
 ----------------------------------------------------------------------
 -- 1. Repair
 ----------------------------------------------------------------------
@@ -67,31 +58,7 @@ function Q:Repair()
 end
 
 ----------------------------------------------------------------------
--- 2. Junk
-----------------------------------------------------------------------
-function Q:SellJunk()
-    local C = C_Container
-    if not (C and C.GetContainerNumSlots and C.GetContainerItemInfo and C.UseContainerItem) then return end
-    local sold, total = 0, 0
-    for bag = 0, OMQ.LastBag() do
-        for slot = 1, C.GetContainerNumSlots(bag) or 0 do
-            local info = C.GetContainerItemInfo(bag, slot)
-            local ahLow = info and info.itemID and OMQ.AuctionHelper and OMQ.AuctionHelper.VendorIt(info.itemID)   -- decision 259
-            if info and not isSecret(info.quality) and (info.quality == 0 or ahLow) and not info.hasNoValue then
-                local per = info.hyperlink and sellPrice(info.hyperlink) or 0
-                C.UseContainerItem(bag, slot)
-                sold = sold + 1
-                total = total + (per or 0) * (info.stackCount or 1)
-            end
-        end
-    end
-    if sold > 0 then
-        OMQ:Print(string.format("sold %d grey item%s for %s", sold, sold == 1 and "" or "s", money(total)))
-    end
-end
-
-----------------------------------------------------------------------
--- 3. Water
+-- 2. Water
 ----------------------------------------------------------------------
 -- price, pieces per purchase, stock (-1 = unlimited), usable
 local function merchantInfo(i)
@@ -154,7 +121,7 @@ function Q:BuyWater()
 end
 
 ----------------------------------------------------------------------
--- 4. Ammo (hunters)
+-- 3. Ammo (hunters)
 ----------------------------------------------------------------------
 local CLASS_WEAPON, CLASS_PROJECTILE, CLASS_QUIVER = 2, 6, 11
 -- ranged weapon subclass -> ammo subclass (also the quiver subclass: 2 quiver, 3 ammo pouch)
@@ -367,8 +334,7 @@ local function onMerchant()
         if not ok then OMQ:Error("qol " .. part, err) end
     end
     run("repair", Q.Repair)
-    run("junk", Q.SellJunk)
-    -- let the money of the sale arrive before the water is bought
+    -- let the repair bill settle before the water is bought
     if C_Timer and C_Timer.After then
         C_Timer.After(0.5, function() run("water", Q.BuyWater); run("ammo", Q.BuyAmmo) end)
     else
@@ -384,13 +350,13 @@ frame:SetScript("OnEvent", function() onMerchant() end)
 OMQ:RegisterCommand("qol", function(arg)
     local o = OMQ.db.options.qol
     local part = (arg or ""):lower()
-    if part == "repair" or part == "junk" or part == "water" or part == "ammo" or part == "flight" then
+    if part == "repair" or part == "water" or part == "ammo" or part == "flight" then
         o[part] = not (o[part] ~= false)
         OMQ:Print("qol " .. part .. ": " .. (o[part] and "on" or "off"))
         return
     end
-    OMQ:Print(string.format("repair %s, sell grey items %s, buy water %s, buy ammo %s, follow group flights %s",
-        on("repair") and "on" or "off", on("junk") and "on" or "off", on("water") and "on" or "off", on("ammo") and "on" or "off",
+    OMQ:Print(string.format("repair %s, buy water %s, buy ammo %s, follow group flights %s",
+        on("repair") and "on" or "off", on("water") and "on" or "off", on("ammo") and "on" or "off",
         on("flight") and "on" or "off"))
-    print("  /blato qol repair | junk | water | ammo | flight  (toggle)")
-end, "vendor helpers: auto repair, sell grey items, buy water, buy ammo, follow group flights")
+    print("  /blato qol repair | water | ammo | flight  (toggle)")
+end, "vendor helpers: auto repair, buy water, buy ammo, follow group flights")

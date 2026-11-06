@@ -1,8 +1,7 @@
 -- One More Quest: dad simulator (decision 177), /blato sim
--- Up to three fake dads that live only on this client, to try Bet Check and the group quest
--- tracker alone. While the simulator runs, every addon message goes to the fake dads instead of
+-- Up to three fake dads that live only on this client, to try Bet Check alone. While the simulator runs, every addon message goes to the fake dads instead of
 -- the party (Comm.lua), so real players never see simulated data. The fake dads answer like real
--- clients: they join or skip bets, report values, pay or get paid, and make quest progress.
+-- clients: they join or skip bets, report values, pay or get paid.
 -- Blato Lexicon: their full names are made up and Bet/Mail.lua never mails a fake dad (the original sent
 -- real mail to the author's alts). The default is 2 fake dads: you and two friends, the Bláto party of three.
 --   /blato sim [1-3]                   start with 1 to 3 fake dads (default 2); again: status
@@ -10,9 +9,6 @@
 --   /blato sim bet <kind> [name]       a fake dad starts a bet (death dmg run near npc player fall kb loot roll)
 --   /blato sim die|kb|near|target <name>   the event for a running "first" bet
 --   /blato sim fight                   the fake dads report their damage for "top damage in the next fight"
---   /blato sim quest [name]            a fake dad makes progress on the quest in front (or a random one)
---   /blato sim finish [name]           fake dads (all, or one) finish the quest in front
---   /blato sim auto on|off             random quest progress every 25 to 45 s (default on)
 local ADDON, OMQ = ...
 OMQ = _G.BlatoParty
 
@@ -26,14 +22,10 @@ local ROSTER = {
 }
 S.ROSTER = ROSTER
 local JOIN_CHANCE = 0.8
-local HAVE_QUEST_CHANCE = 0.7            -- the first fake dad has every quest, the others most
-local AUTO_MIN, AUTO_MAX = 25, 45
 
-local dads = {}                          -- { guid, name, full, class, quests = { [qid] = counts } }
+local dads = {}                          -- { guid, name, full, class }
 local byGuid = {}
 local guids = {}
-local auto = true
-local nextAuto = 0
 local ticker
 local paidNote = {}
 local compareAnswer                      -- defined below (gear of Sim Karle)
@@ -45,7 +37,6 @@ local function rnd(a, b) return math.random(a, b) end
 function S:IsSim(guid) return self.active and byGuid[guid] ~= nil or false end
 function S:Guids() return guids end
 function S:Dads() return dads end
-function S:Auto() return auto end
 
 local function deliver(d, msgType, ...)
     local text = OMQ.Encode(msgType, OMQ.protocol, ...)
@@ -72,80 +63,6 @@ local function find(name)
 end
 
 local function randomDad() return dads[rnd(1, #dads)] end
-
-----------------------------------------------------------------------
--- Quests: every fake dad keeps his own counts of the quests in my log
-----------------------------------------------------------------------
-local function myQuests() return (OMQ.QTrack and OMQ.QTrack:Mine()) or {} end
-
-local function copyCounts(src)
-    local out = {}
-    for i, c in ipairs(src or {}) do
-        local m = c.m or 1
-        local n = (m > 1) and rnd(0, m - 1) or 0
-        out[i] = { n = n, m = m, f = false }
-    end
-    return out
-end
-
--- does this fake dad have the quest? decided once per quest
-local function questOf(d, qid)
-    if d.quests[qid] == nil then
-        local q = myQuests()[qid]
-        if not q or #(q.counts or {}) == 0 then return nil end
-        local has = (d.index == 1) or (math.random() < HAVE_QUEST_CHANCE)
-        d.quests[qid] = has and copyCounts(q.counts) or false
-    end
-    return d.quests[qid] or nil
-end
-
-local function encode(counts) return OMQ.QTrack.Encode(counts) end
-
-local function progress(d, qid, all)
-    local c = questOf(d, qid)
-    if not c then return false end
-    local open = {}
-    for i, o in ipairs(c) do if not o.f then open[#open + 1] = i end end
-    if #open == 0 then return false end
-    if all then
-        for _, o in ipairs(c) do o.n, o.f = o.m, true end
-    else
-        local o = c[open[rnd(1, #open)]]
-        o.n = math.min(o.m, o.n + 1)
-        o.f = o.n >= o.m
-    end
-    deliver(d, "QP", d.guid, tostring(qid), encode(c))
-    -- the other fake dads answer the new card like real clients do
-    for _, o in ipairs(dads) do
-        if o ~= d then
-            later(rnd(3, 10) / 10, function()
-                local oc = questOf(o, qid)
-                if oc then deliver(o, "QR", o.guid, tostring(qid), encode(oc))
-                else deliver(o, "QG", o.guid, tostring(qid)) end
-            end)
-        end
-    end
-    return true
-end
-
-local function frontQuest()
-    local cards = OMQ.QTrack and OMQ.QTrack:Cards() or {}
-    if cards[1] then return cards[1] end
-    local ids = {}
-    for qid in pairs(myQuests()) do ids[#ids + 1] = qid end
-    if #ids == 0 then return nil end
-    return ids[rnd(1, #ids)]
-end
-
-local function randomProgress(d)
-    local ids = {}
-    for qid in pairs(myQuests()) do
-        local c = questOf(d, qid)
-        if c and not OMQ.QTrack.Complete(c) then ids[#ids + 1] = qid end
-    end
-    if #ids == 0 then return false end
-    return progress(d, ids[rnd(1, #ids)])
-end
 
 ----------------------------------------------------------------------
 -- Bets
@@ -233,15 +150,6 @@ function S:Outgoing(text)
             -- Alt on an item: every fake dad compares it with what he wears
             if f[1] and f[3] then
                 for i, d in ipairs(dads) do later(0.2 + i * 0.1, function() compareAnswer(d, f[1], f[3], 0) end) end
-            end
-        elseif msgType == "QP" then
-            local qid = tonumber(f[2])
-            for _, d in ipairs(dads) do
-                later(rnd(3, 10) / 10, function()
-                    local c = questOf(d, qid)
-                    if c then deliver(d, "QR", d.guid, tostring(qid), encode(c))
-                    else deliver(d, "QG", d.guid, tostring(qid)) end
-                end)
             end
         end
     end)
@@ -354,13 +262,6 @@ local function tick()
     for _, d in ipairs(dads) do
         if now() - (d.helloAt or 0) > 60 then d.helloAt = now(); hello(d) end
     end
-    if auto and now() >= nextAuto then
-        nextAuto = now() + rnd(AUTO_MIN, AUTO_MAX)
-        local order = {}
-        for _, d in ipairs(dads) do order[#order + 1] = d end
-        for i = #order, 2, -1 do local j = rnd(1, i); order[i], order[j] = order[j], order[i] end
-        for _, d in ipairs(order) do if randomProgress(d) then break end end
-    end
 end
 
 function S:Start(count)
@@ -370,14 +271,13 @@ function S:Start(count)
     for i = 1, count do
         local r = ROSTER[i]
         local d = { index = i, guid = string.format("Player-0-SIM%05d", i), name = r.name, full = r.full,
-                    class = r.class, quests = {} }
+                    class = r.class }
         dads[i], byGuid[d.guid], guids[i] = d, d, d.guid
     end
     self.active = true
     if OMQ.ResetGroupCache then OMQ:ResetGroupCache() end
     for _, d in ipairs(dads) do d.helloAt = now(); hello(d) end
     for _, d in ipairs(dads) do sendGear(d) end
-    nextAuto = now() + rnd(AUTO_MIN, AUTO_MAX)
     if not ticker then ticker = C_Timer.NewTicker(1, function() if S.active then pcall(tick) end end) end
     local names = {}
     for _, d in ipairs(dads) do names[#names + 1] = d.full end
@@ -409,7 +309,6 @@ function S:Stop(quiet)
     self.active = false
     dads, byGuid, guids = {}, {}, {}
     if OMQ.ResetGroupCache then OMQ:ResetGroupCache() end
-    if OMQ.QTrack then OMQ.QTrack:Hide() end
     OMQ:Fire("ROSTER_CHANGED")
     OMQ:Fire("BETS_CHANGED")
     if not quiet then say("off: fake friends, their bets and their debts are gone.") end
@@ -417,12 +316,8 @@ end
 
 local function status()
     if not S.active then say("off. /blato sim [1-3] starts it."); return end
-    for _, d in ipairs(dads) do
-        local n = 0
-        for _, c in pairs(d.quests) do if c then n = n + 1 end end
-        say(string.format("%s (%s), quests known: %d", d.full, d.class, n))
-    end
-    say("auto quest progress: " .. (auto and "on" or "off") .. ". Commands: bet <kind> [name], die|kb|near|target <name>, fight, quest [name], finish [name], auto on|off, off")
+    for _, d in ipairs(dads) do say(string.format("%s (%s)", d.full, d.class)) end
+    say("Commands: bet <kind> [name], die|kb|near|target <name>, fight, off")
 end
 
 OMQ:RegisterCommand("sim", function(arg)
@@ -445,22 +340,7 @@ OMQ:RegisterCommand("sim", function(arg)
         if not S:Event(d, cmd) then say("no running bet for that") end
     elseif cmd == "fight" then
         for _, b in ipairs(B():Running()) do if b.kind == "dmg" and b.state == "active" then fightValues(b.id) end end
-    elseif cmd == "quest" then
-        local d = find(rest) or randomDad()
-        local qid = frontQuest()
-        if not (qid and progress(d, qid)) and not randomProgress(d) then say(d.name .. " has nothing left to do") end
-    elseif cmd == "finish" then
-        local qid = frontQuest()
-        if not qid then say("no quest in your log"); return end
-        local only = find(rest)
-        for _, d in ipairs(dads) do
-            if not only or only == d then progress(d, qid, true) end
-        end
-    elseif cmd == "auto" then
-        auto = rest ~= "off"
-        nextAuto = now() + rnd(AUTO_MIN, AUTO_MAX)
-        say("auto quest progress " .. (auto and "on" or "off"))
     else
         status()
     end
-end, "friend simulator: /blato sim [1-3] | off | bet <kind> [name] | die|kb|near|target <name> | fight | quest [name] | finish [name] | auto on|off")
+end, "friend simulator: /blato sim [1-3] | off | bet <kind> [name] | die|kb|near|target <name> | fight")

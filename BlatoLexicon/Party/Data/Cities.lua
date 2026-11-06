@@ -42,7 +42,7 @@ function OMQ:InTown()
             end
         end
     end
-    local NQ = OMQ.NextQuest
+    local NQ = OMQ.QuestFilter
     local map = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
     if NQ and NQ.World and map then
         local n = 0

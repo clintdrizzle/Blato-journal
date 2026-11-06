@@ -13,11 +13,8 @@ OMQ.LayoutProbe = LP
 LP.FRAMES = {
     { key = "arrow",    label = "Distance arrow",          frame = "BlatoPartyArrow",        saved = function() return OMQ.db.arrow.point end },
     { key = "alerts",   label = "Alert cards",             frame = "BlatoPartyAlerts",       saved = function() return OMQ.db.alerts.point end },
-    { key = "bar",      label = "Guidance bar",            frame = "BlatoPartyGuideBar",     saved = function() return OMQ.db.guide.point end },
-    { key = "checkbar", label = "Check bar (follows the guidance bar)", frame = "BlatoPartyCheckBar", saved = function() return nil end },
-    { key = "qtrack",   label = "Quest tracker",           frame = "BlatoPartyQuestTracker", saved = function() return OMQ.db.qtrack and OMQ.db.qtrack.point end },
     { key = "lifetime", label = "Lifetime statistics",     frame = "BlatoPartyLifetime",     saved = function() return OMQ.db.lifetimeWindow end },
-    { key = "betstrip", label = "Running bets (follows the check bar)", frame = "BlatoPartyBetStrip", saved = function() return nil end },
+    { key = "betstrip", label = "Running bets", frame = "BlatoPartyBetStrip", saved = function() return nil end },
 }
 
 local function num(v) return type(v) == "number" and not (issecretvalue and issecretvalue(v)) end

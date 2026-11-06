@@ -235,7 +235,7 @@ end
 
 -- My turn: every quest of mine that a dad lacks AND can take is shared once (decision 297).
 -- First I ask the dads which of these quests they can take (not done before, pre-quests done, level,
--- faction, race, class: NextQuest.Acceptable); a dad who does not answer (older addon) counts as "yes".
+-- faction, race, class: QuestFilter.Acceptable); a dad who does not answer (older addon) counts as "yes".
 function Q:BeginTurn()
     if not round or round.started then return end
     round.started = true
@@ -247,7 +247,7 @@ function Q:BeginTurn()
         end
         table.sort(ids)
         if #ids == 0 then return end
-        local NQ = OMQ.NextQuest
+        local NQ = OMQ.QuestFilter
         local me = OMQ:GetSelf()
         if not (NQ and NQ._ids and me) then
             for _, id in ipairs(ids) do queuePush(id) end
@@ -290,7 +290,7 @@ end
 OMQ:RegisterMessage("QA", function(fields)
     local reqid, from, list = fields[1], fields[2], fields[3]
     local me = OMQ:GetSelf()
-    local NQ = OMQ.NextQuest
+    local NQ = OMQ.QuestFilter
     if not (reqid and me and NQ and NQ.Acceptable) or from == me.guid then return end
     local log = Q:ReadLog()
     local can = {}
@@ -303,7 +303,7 @@ end)
 OMQ:RegisterMessage("QB", function(fields)
     local reqid, from, list = fields[1], fields[2], fields[3]
     local a = round and round.asking
-    local NQ = OMQ.NextQuest
+    local NQ = OMQ.QuestFilter
     if not (a and NQ and reqid == a.reqid and from) then return end
     a.replies[from] = NQ._set(list)
 end)

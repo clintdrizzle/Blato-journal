@@ -98,7 +98,7 @@ local function update(_, elapsed)
         if not curve then M.unavailable = M.unavailable or {}; M.unavailable.drink = curveError; return end
     end
     local ok, err = pcall(function()
-        local best = OMQ.Ready and OMQ.Ready.BestDrink and OMQ.Ready.BestDrink()
+        local best = OMQ.Supplies and OMQ.Supplies.BestDrink and OMQ.Supplies.BestDrink()
         if best then
             card:SetAttribute("type1", "item")
             card:SetAttribute("item1", "item:" .. best)

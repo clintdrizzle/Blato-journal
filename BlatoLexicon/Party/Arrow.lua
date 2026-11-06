@@ -1,6 +1,7 @@
 -- One More Quest: distance arrow (section 6)
--- Shown only to the straggler: when every other group member is farther away
--- than the threshold (or in another zone), an arrow points at one of them.
+-- Shown to the straggler: when every other group member is farther away than the
+-- threshold (or in another zone), an arrow points at one of them. Blato Lexicon: and
+-- to the friends left behind: somebody who ran off from all of them gets the arrow too.
 -- Positions are broadcast by every client (message "P"), so the arrow does not
 -- depend on UnitPosition working for other players.
 local ADDON, OMQ = ...
@@ -170,15 +171,32 @@ function A:Evaluate()
         if m.sameZone and m.distance and (not nearest or m.distance < nearest.distance) then nearest = m end
     end
     local limit = prevShown and threshold * HYSTERESIS or threshold
+    local runaway
     if nearest and nearest.distance <= limit then
-        state.reason = "close enough"; state.members = members
-        return state
+        -- I am with somebody, but a friend far from all of us still gets the arrow
+        for _, m in ipairs(members) do
+            if m.sameZone and m.distance and m.distance > limit and not (runaway and runaway.distance <= m.distance) then
+                local alone = true
+                for _, o in ipairs(members) do
+                    if o ~= m and o.pos.inst == m.pos.inst
+                        and math.sqrt((o.pos.a - m.pos.a) ^ 2 + (o.pos.b - m.pos.b) ^ 2) <= limit then
+                        alone = false
+                        break
+                    end
+                end
+                if alone then runaway = m end
+            end
+        end
+        if not runaway then
+            state.reason = "close enough"; state.members = members
+            return state
+        end
     end
     state.members = members
 
     -- choose the target: manual choice if still valid, else nearest, else anybody
-    local target
-    if manual and selectedGuid then
+    local target = runaway
+    if not target and manual and selectedGuid then
         for _, m in ipairs(members) do if m.guid == selectedGuid then target = m end end
         if not target then manual = false end
     end
@@ -326,12 +344,6 @@ local function build()
 
     arrowFrame:SetScript("OnClick", function(_, button)
         if moveMode then return end
-        if OMQ.Guide and OMQ.Guide:IsActive() then
-            local back = IsShiftKeyDown and IsShiftKeyDown()
-            if button == "LeftButton" then OMQ.Guide:Cycle(back and -1 or 1)
-            else OMQ.Guide:Clear(); OMQ:Print("guidance cancelled") end
-            return
-        end
         local back = IsShiftKeyDown and IsShiftKeyDown()
         if button == "LeftButton" then A:CycleTarget(back and -1 or 1) else A:HideForFiveMinutes() end
     end)
@@ -350,22 +362,6 @@ local function render()
         distText:SetText("drag to move")
         rotate(0)
         texture:SetVertexColor(1, 0.82, 0)
-        return
-    end
-    local g = OMQ.Guide and OMQ.Guide:Current()
-    if g then
-        nameText:SetText(g.name)
-        nameText:SetTextColor(0.55, 0.85, 1)
-        if g.otherZone then
-            distText:SetText("other continent")
-            rotate(0)
-            texture:SetVertexColor(0.6, 0.63, 0.68)
-        else
-            distText:SetText(string.format("%d yd", math.floor(g.distance + 0.5)))
-            texture:SetVertexColor(0.45, 0.8, 1)
-            if g.heading then point(g.heading) end
-        end
-        arrowFrame:Show()
         return
     end
     if GetTime() < hideUntil then arrowFrame:Hide(); return end

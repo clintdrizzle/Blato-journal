@@ -232,7 +232,7 @@ SlashCmdList.BLATOLEXICON = function(msg)
             end
         end
     elseif cmd == "why" then UI.Why()
-    elseif cmd == "commands" or cmd == "dungeons" or cmd == "journey" or cmd == "places" or cmd == "notes" or cmd == "quests" then UI.Show(cmd)
+    elseif cmd == "commands" or cmd == "journey" or cmd == "places" or cmd == "notes" or cmd == "quests" then UI.Show(cmd)
     elseif cmd == "place" and rest ~= "" then UI.OpenPlace(rest)
     elseif cmd == "tour" then
         -- Design check: shows every page for a few seconds, in modern dark then modern parchment, then puts the
@@ -242,7 +242,7 @@ SlashCmdList.BLATOLEXICON = function(msg)
         for z, r in pairs(J2.H.zones) do if not zone or r.time > J2.H.zones[zone].time then zone = z end end
         local dungeon
         for name, d in pairs(J2.H.dungeons or {}) do if not dungeon or (d.time or 0) > (J2.H.dungeons[dungeon].time or 0) then dungeon = name end end
-        local pages = { "commands", "dungeons", "journey", "places", "place", "dungeon", "quests", "questsopen", "notes" }
+        local pages = { "commands", "journey", "places", "place", "dungeon", "quests", "questsopen", "notes" }
         local steps, keep = {}, DB.style
         for _, style in ipairs({ "classic", "moderndark", "modernparchment" }) do
             for _, pg in ipairs(pages) do steps[#steps + 1] = { style, pg } end
