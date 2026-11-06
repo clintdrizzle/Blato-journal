@@ -3,6 +3,8 @@
 -- sharing does not work it is not tried again, and there is no card for quests. The only
 -- other trigger is a new group member: then everybody shares in turn (player 1, then
 -- player 2 ...), each quest tried once per round.
+-- Blato Lexicon: the game's quest push goes to the whole group and cannot name who gets it, so nothing is pushed while
+-- a stranger is in the group (OMQ:StrangerInGroup in Comm.lua). When they have left, a round shares what was missed.
 local ADDON, OMQ = ...
 OMQ = _G.BlatoParty
 
@@ -16,6 +18,7 @@ local ROUND_DELAY = 5           -- seconds after the last newcomer before a roun
 local HANDOFF_AFTER = 3         -- seconds after the last push until the next player starts
 local HANDOFF_TIMEOUT = 60      -- the next player starts anyway after this long
 local ASK_WAIT = 2              -- seconds to wait for the answers "which of these can you take" (decision 297)
+local STRANGER_NOTICE = 8       -- seconds before the chat says so: a friend's hello can be a moment late
 
 local Q = {}
 OMQ.QuestSync = Q
@@ -131,7 +134,8 @@ local function levelOf(guid)
     end
     for i = 1, 4 do
         local unit = "party" .. i
-        if UnitGUID and UnitGUID(unit) == guid then
+        local g = UnitGUID and UnitGUID(unit)
+        if not (issecretvalue and issecretvalue(g)) and g == guid then
             local l = UnitLevel and UnitLevel(unit)
             if type(l) == "number" and l > 0 and not (issecretvalue and issecretvalue(l)) then return l end
         end
@@ -188,7 +192,7 @@ end
 -- Quests that reached me through a share are not passed on. Quests nobody lacks, class
 -- quests and unshareable quests are skipped. There is no second attempt.
 function Q:ShareNew(added)
-    if not OMQ:QuestShareOn() or not OMQ:GetChannel() then return end
+    if not OMQ:QuestShareOn() or not OMQ:GetChannel() or OMQ:StrangerInGroup() then return end
     table.sort(added)
     for _, id in ipairs(added) do
         if received[id] then
@@ -220,7 +224,7 @@ end
 
 function Q:StartRound()
     round = nil
-    if not OMQ:QuestSyncOn() or not OMQ:GetChannel() then return end
+    if not OMQ:QuestSyncOn() or not OMQ:GetChannel() or OMQ:StrangerInGroup() then return end
     local me = OMQ:GetSelf()
     if not me then return end
     local order = turnOrder()
@@ -240,7 +244,7 @@ function Q:BeginTurn()
     if not round or round.started then return end
     round.started = true
     self:Refresh(true)
-    if OMQ:QuestShareOn() then
+    if OMQ:QuestShareOn() and not OMQ:StrangerInGroup() then
         local ids = {}
         for id in pairs(myIds) do
             if pushable(id) and somebodyLacks(id) then ids[#ids + 1] = id end
@@ -332,6 +336,8 @@ end
 local function processQueues()
     local now = GetTime()
     if changeDue and now >= changeDue then changeDue = nil; Q:Refresh() end
+    -- a stranger came in the meantime: the round after they have left shares these
+    if #pushQueue > 0 and OMQ:StrangerInGroup() then pushQueue = {} end
     -- pushes: announce first, push SHARE_WAIT seconds later
     local item = pushQueue[1]
     if item and now >= item.at and now >= nextPushAt then
@@ -408,8 +414,15 @@ end)
 
 OMQ:On("READY", function()
     Q:Refresh(true)
-    C_Timer.NewTicker(0.3, function() pcall(processQueues) end)
-    C_Timer.NewTicker(SEND_INTERVAL, function() pcall(sendList) end)
+    -- an error here would stop the sharing without a word, so it goes to the error log
+    local function logged(fn, where)
+        return function()
+            local ok, err = pcall(fn)
+            if not ok then OMQ:Error(where, err) end
+        end
+    end
+    C_Timer.NewTicker(0.3, logged(processQueues, "quest queue"))
+    C_Timer.NewTicker(SEND_INTERVAL, logged(sendList, "quest list"))
 end)
 
 -- A newcomer needs our list; every newcomer starts a (debounced) sync round.
@@ -419,8 +432,31 @@ OMQ:On("USER_JOINED", function()
     round = nil
 end)
 
+local strangerNoticed = false
+OMQ:On("STRANGER_CHANGED", function(on)
+    round = nil
+    if on then
+        C_Timer.After(STRANGER_NOTICE, function()
+            if OMQ:StrangerInGroup() and OMQ:QuestShareOn() and not strangerNoticed then
+                strangerNoticed = true
+                OMQ:Print("somebody in the group does not run this addon: quests are not shared automatically until they leave")
+            end
+        end)
+    else
+        roundStartAt = GetTime() + ROUND_DELAY
+        if strangerNoticed then
+            strangerNoticed = false
+            OMQ:Print("no stranger in the group any more: quests are shared automatically again")
+        end
+    end
+end)
+
 OMQ:RegisterCommand("quests", function(arg)
     if arg == "sync" then
+        if OMQ:StrangerInGroup() then
+            OMQ:Print("somebody in the group does not run this addon: no quests are shared until they leave")
+            return
+        end
         roundStartAt = GetTime() + 0.5
         OMQ:Print("sync round starts")
         return
@@ -442,7 +478,8 @@ OMQ:RegisterCommand("quests", function(arg)
     local n = 0
     for _ in pairs(myIds) do n = n + 1 end
     OMQ:Print(string.format("quest sync %s, %d quests in your log", OMQ.db.options.questSync and "on" or "off", n))
-    print("  automatic sharing " .. (OMQ.db.options.autoShare ~= false and "on" or "off"))
+    print("  automatic sharing " .. (OMQ.db.options.autoShare ~= false and "on" or "off")
+        .. (OMQ:StrangerInGroup() and ", paused: somebody in the group does not run this addon" or ""))
     for guid, u in pairs(OMQ.users) do
         local count = 0
         for _ in pairs(u.quests or {}) do count = count + 1 end

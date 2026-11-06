@@ -59,11 +59,6 @@ local function alertItems()
                 tip = "Checked: the highest learned rank of a spell has to be on a bar. Unchecked: any rank is fine.",
                 get = function() return not OMQ.db.alerts.lenientRank end,
                 set = function(v) OMQ.db.alerts.lenientRank = not v; OMQ.Alerts:Evaluate() end }
-        elseif id == "buff" then
-            out[#out + 1] = { type = "check", indent = true, label = "Buff tracking for players without the addon",
-                tip = "Checked: missing buffs are shown for every group member. Unchecked: only for players with the addon.",
-                get = function() return not OMQ.db.options.buffOnlyAddon end,
-                set = function(v) OMQ.db.options.buffOnlyAddon = not v; OMQ.Alerts:Evaluate() end }
         end
         end
     end

@@ -29,7 +29,6 @@ local DEFAULTS = {
         questSync = true,
         autoShare = true,
         snoozeUntil = 0,
-        buffOnlyAddon = false,
         compare = true,
         needs = true,
         sound = false,               -- soft sounds, off by default (decision 185)

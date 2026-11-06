@@ -25,14 +25,14 @@ local function grouped()
     return IsInGroup and IsInGroup() and not (IsInRaid and IsInRaid()) or false
 end
 
--- the group: me and party1 to party4 -> { unit, guid }
+-- the group: me and the friends among party1 to party4 -> { unit, guid } (a stranger's fight is not ours)
 local function members()
     local out = { { unit = "player", guid = UnitGUID("player") } }
     for i = 1, 4 do
         local unit = "party" .. i
         if UnitExists and UnitExists(unit) then
             local g = UnitGUID(unit)
-            if g and not isSecret(g) then out[#out + 1] = { unit = unit, guid = g } end
+            if not isSecret(g) and g and OMQ.users[g] then out[#out + 1] = { unit = unit, guid = g } end
         end
     end
     return out

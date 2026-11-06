@@ -972,13 +972,6 @@ local function unitInReach(unit)
     return true
 end
 
--- true when the unit is a group member who runs the addon
-local function hasAddon(unit)
-    local guid = UnitGUID(unit)
-    local u = guid and OMQ.users[guid]
-    return u ~= nil and OMQ:IsOnline(u)
-end
-
 -- Is a temporary enchantment (imbue, poison) on the main hand weapon?
 -- Two sources, because not every client reports it the same way:
 -- GetWeaponEnchantInfo and the imbue line in the weapon tooltip.
@@ -1200,7 +1193,7 @@ M:Register({
                         for i = 1, 4 do units[#units + 1] = "party" .. i end
                     end
                     for _, unit in ipairs(units) do
-                        local wanted = unit == "player" or not OMQ.db.options.buffOnlyAddon or hasAddon(unit)
+                        local wanted = unit == "player" or OMQ:IsFriendUnit(unit)   -- a stranger's buffs are not ours
                         if wanted and UnitExists(unit) and (unit == "player" or unitInReach(unit)) then
                             local names = auraNames(unit)
                             if names then

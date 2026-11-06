@@ -1,4 +1,4 @@
--- BlatoLexicon fellowship: everyone you group with. Per companion: when, where and at which levels you met,
+-- BlatoLexicon fellowship: the friends you group with, the ones who run this addon. Per companion: when, where and at which levels you met,
 -- time grouped (split into dungeons, fighting, travelling and time in town), the levels you gained side by side,
 -- quests done together and dungeon runs together. Counted each second you share a group; names the game keeps
 -- secret (inside some instances) are skipped rather than guessed.
@@ -8,13 +8,16 @@ local DB, H = J.DB, J.H
 
 local function Plain(v) return type(v) == "string" and not (issecretvalue and issecretvalue(v)) and v ~= "" and v or nil end
 
--- The group's other members as unit tokens.
+-- The friends in the group as unit tokens (a stranger is no companion, Party/Comm.lua).
 local function Units()
-    local out = {}
+    local out, OMQ = {}, ns.OMQ
+    local function add(unit)
+        if not OMQ or OMQ:IsFriendUnit(unit) then out[#out + 1] = unit end
+    end
     if IsInRaid and IsInRaid() then
-        for i = 1, (GetNumGroupMembers() or 0) do if not UnitIsUnit("raid" .. i, "player") then out[#out + 1] = "raid" .. i end end
+        for i = 1, (GetNumGroupMembers() or 0) do if not UnitIsUnit("raid" .. i, "player") then add("raid" .. i) end end
     elseif IsInGroup and IsInGroup() then
-        for i = 1, 4 do if UnitExists("party" .. i) then out[#out + 1] = "party" .. i end end
+        for i = 1, 4 do if UnitExists("party" .. i) then add("party" .. i) end end
     end
     return out
 end

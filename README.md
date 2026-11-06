@@ -17,6 +17,8 @@ The **Blato Lexicon** window (minimap button or `/blato`) looks like WoW Forever
 
 Most party features come alive when all three of you run the addon. Your party mates are the two players you have spent the most time grouped with.
 
+The addon is for the friends who run it, and anybody else in your group is left alone: no alert cards, statistics or journal entries about them. While they are in the group, quests are not shared automatically, because the game would offer every shared quest to them too. You can still share by hand, and the addon catches up when they have left.
+
 <p align="center"><img src=".github/features.jpg" alt="Blato Lexicon features: autofollow with one key, bets, quest sync and auto share, lifetime stats, reminders, a tracker of your journey together, a shared notepad, designs and sounds, an arrow to your buddy, and much more" width="100%"></p>
 
 ## Install
@@ -24,6 +26,8 @@ Most party features come alive when all three of you run the addon. Your party m
 1. Download the latest `BlatoLexicon_vX.Y.Z.zip` from [Releases](../../releases).
 2. Unzip it into the `Interface/AddOns` folder of your WoW Forever installation (this gives `Interface/AddOns/BlatoLexicon`).
 3. Restart the game if it is running: a new addon, or an update that changes the addon's file list, is not picked up by `/reload`.
+
+Update all three of you together: versions before 0.3.2 cannot talk to 0.3.2 or newer.
 
 Upgrading from version 0.1.x, when this addon was still called Bláto Journal: delete the `Interface/AddOns/BlatoJournal` folder first, the two cannot run side by side. To keep your data, with the game closed, rename every `BlatoJournal.lua` to `BlatoLexicon.lua` under `WTF/Account` (in the account's `SavedVariables` folder and in each character's).
 
@@ -58,6 +62,7 @@ Changes from the originals:
 - a shared notepad: notes marked shared go to the party (`Together.lua`, messages JN/JNX/JNQ);
 - left out from One More Quest: automatic quest accepting and turn-in, Shift-click heals, the Dad UI, the chat filter, the guided tour, selling grey items, the group quest tracker, the arrows to places and quests, the meeting point, and the dungeon tools (Group Check, Progress Check, threat meter, dungeon quests and loot);
 - the arrow also shows the friends left behind who ran off from the group, not only the one who fell behind (`A:Evaluate` in `Party/Arrow.lua`);
+- only the friends who run the addon count: a stranger in the group is left alone (`OMQ:StrangerInGroup` in `Party/Comm.lua`), and the addon messages have their own prefix, so somebody running One More Quest is not taken for a friend;
 - renamed globals, saved variables and commands (`/blato`, `/bl`), so Blato Lexicon can be installed next to the originals;
 - the simulator (`/blato sim`) starts with 2 party mates and never sends real mail;
 - a log of errors that survives a reload (`BlatoLexicon/ErrorLog.lua`).

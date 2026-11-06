@@ -3,7 +3,8 @@
 local ADDON, OMQ = ...
 OMQ = _G.BlatoParty
 
-local PREFIX = "OMQ"
+-- not the "OMQ" of One More Quest: somebody who runs that addon is not one of the friends
+local PREFIX = "BlatoLexicon"
 local OFFLINE_AFTER = 3600      -- decision 57: offline after 1 hour of silence
 local HEARTBEAT = 60            -- seconds between HELLO messages while grouped
 local MIN_HELLO_GAP = 5         -- never send two HELLOs closer than this
@@ -197,7 +198,7 @@ local function groupMembers()
             local unit = "party" .. i
             if UnitExists and UnitExists(unit) then
                 local g = UnitGUID(unit)
-                if g and not (issecretvalue and issecretvalue(g)) then set[g] = i end
+                if not (issecretvalue and issecretvalue(g)) and g then set[g] = i end
             end
         end
     end
@@ -230,6 +231,58 @@ end
 function OMQ:IsOnline(user)
     return user and (GetTime() - user.lastSeen) < OFFLINE_AFTER and self:InGroup(user.guid) or false
 end
+
+----------------------------------------------------------------------
+-- Blato Lexicon: the addon is for the friends who run it. Anybody else in the group is a stranger and is left alone.
+----------------------------------------------------------------------
+local function isSecret(v) return issecretvalue and issecretvalue(v) end
+
+-- Is this group member one of the friends? A GUID the game keeps secret tells nothing, so: no.
+function OMQ:IsFriendUnit(unit)
+    local g = UnitGUID and UnitGUID(unit)
+    if isSecret(g) or not g then return false end
+    return self.users[g] ~= nil
+end
+
+local strangerHere = false
+
+local function findStranger()
+    if OMQ.Sim and OMQ.Sim.active then return false end
+    if not (IsInGroup and IsInGroup()) then return false end
+    local known, unread = 0, 0
+    for i = 1, 4 do
+        local unit = "party" .. i
+        -- somebody offline gets nothing from the game either
+        if UnitExists(unit) and not (UnitIsConnected and not UnitIsConnected(unit)) then
+            local g = UnitGUID(unit)
+            if isSecret(g) or not g then unread = unread + 1
+            elseif OMQ.users[g] then known = known + 1
+            else return true end
+        end
+    end
+    if unread == 0 then return false end
+    -- GUIDs the game keeps secret: only the number of friends can tell
+    local me, friends = OMQ:GetSelf(), 0
+    for guid in pairs(OMQ.users) do
+        if not me or guid ~= me.guid then friends = friends + 1 end
+    end
+    return known + unread > friends
+end
+
+-- A friend whose hello is still on its way counts as a stranger for a moment.
+local function updateStranger()
+    local now = findStranger()
+    if now ~= strangerHere then
+        strangerHere = now
+        OMQ:Fire("STRANGER_CHANGED", now)
+    end
+end
+
+-- Is somebody online in my group who does not run this addon?
+function OMQ:StrangerInGroup() return strangerHere end
+
+OMQ:On("ROSTER_CHANGED", updateStranger)
+OMQ:On("USER_UPDATED", updateStranger)
 
 function OMQ:TouchUser(guid, name, version, class, fullName)
     local u = self.users[guid]
@@ -355,6 +408,8 @@ OMQ:On("READY", function()
     C_Timer.NewTicker(0.3, function() local ok, err = pcall(flush); if not ok then OMQ:Error("send queue", err) end end)
     C_Timer.NewTicker(HEARTBEAT, function()
         if OMQ:GetChannel() then OMQ:SendHello(true) end
+        local ok, err = pcall(updateStranger)
+        if not ok then OMQ:Error("stranger check", err) end
     end)
 end)
 

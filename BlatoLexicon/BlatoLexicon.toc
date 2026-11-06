@@ -4,7 +4,7 @@
 ## Author: Bláto party (based on ForeverJournal by Ugge Zen and One More Quest by MadDadVibe)
 ## IconTexture: Interface/Icons/Spell_Nature_EarthElemental_Totem
 ## X-License: GPL-3.0
-## Version: 0.3.1
+## Version: 0.3.2
 ## OptionalDeps: !ForeverData, !ForeverDataProtect
 ## SavedVariables: BJ_DB, BJ_Chars, BlatoPartyDB, BlatoLexiconErrors
 ## SavedVariablesPerCharacter: BJ_DBC, BJ_Char
